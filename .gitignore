@@ -1,0 +1,35 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.env
+
+# Secrets / credentials
+*.json
+!dbt/dvf/**/*.json
+.gcp/
+*-sa.json
+service-account*.json
+
+# dbt
+dbt/dvf/target/
+dbt/dvf/dbt_packages/
+dbt/dvf/logs/
+.user.yml
+
+# Données locales
+data/
+*.csv
+*.csv.gz
+*.parquet
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/
+
+# Rapports générés
+exploration/output/
+
+# Seeds dbt (référentiels versionnés)
+!dbt/dvf/seeds/*.csv
