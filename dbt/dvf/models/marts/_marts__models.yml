@@ -1,0 +1,68 @@
+version: 2
+
+models:
+  - name: fact_transactions
+    description: "Table de faits des ventes immobilières, grain = une mutation."
+    columns:
+      - name: transaction_id
+        tests: [unique, not_null]
+      - name: date_key
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_temps')
+              field: date_key
+      - name: geo_key
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_geo')
+              field: geo_key
+      - name: bien_key
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_bien')
+              field: bien_key
+      - name: valeur_fonciere
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: false
+      - name: prix_m2
+        description: "Prix au m² habitable, renseigné uniquement pour les ventes simples d'un logement."
+        tests:
+          # En avertissement : quelques ventes à valeur symbolique (quelques
+          # euros) donnent un prix arrondi à 0. Elles sont conservées et
+          # écartées par est_prix_m2_fiable plutôt que supprimées.
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: false
+              config:
+                severity: warn
+
+  - name: dim_geo
+    description: "Dimension commune (arrondissement pour Paris), avec département et zone."
+    columns:
+      - name: geo_key
+        tests: [unique, not_null]
+      - name: zone
+        tests: [not_null]
+
+  - name: dim_temps
+    description: "Dimension calendrier au jour."
+    columns:
+      - name: date_key
+        tests: [unique, not_null]
+
+  - name: dim_bien
+    description: "Dimension typologie de bien x nombre de pièces x tranche de surface."
+    columns:
+      - name: bien_key
+        tests: [unique, not_null]
+
+  - name: mart_ecarts_prix
+    description: "Ventes simples comparées au prix au m² prédit par le modèle (écart en %)."
+    columns:
+      - name: transaction_id
+        tests: [unique, not_null]

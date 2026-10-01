@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: ml
+    database: "{{ env_var('GCP_PROJECT_ID', 'ton-projet-gcp') }}"
+    schema: analytics_ml
+    description: "Sorties du modèle de prix au m² (écrites par ml/train_prix_m2.py)."
+    tables:
+      - name: predictions_prix_m2
+        columns:
+          - name: transaction_id
+            tests: [unique, not_null]
