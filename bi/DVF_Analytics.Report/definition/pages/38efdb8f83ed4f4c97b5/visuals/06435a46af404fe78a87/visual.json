@@ -1,0 +1,55 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "06435a46af404fe78a87",
+  "position": {
+    "x": 1082,
+    "y": 12,
+    "z": 2000,
+    "height": 60,
+    "width": 178,
+    "tabOrder": 2000
+  },
+  "visual": {
+    "visualType": "slicer",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_bien"
+                    }
+                  },
+                  "Property": "type_bien"
+                }
+              },
+              "queryRef": "dim_bien.type_bien",
+              "nativeQueryRef": "type_bien",
+              "active": true,
+              "displayName": "Type de bien"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "data": [
+        {
+          "properties": {
+            "mode": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Dropdown'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

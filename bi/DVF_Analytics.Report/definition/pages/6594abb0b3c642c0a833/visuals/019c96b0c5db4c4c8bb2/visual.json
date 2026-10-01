@@ -1,0 +1,55 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "019c96b0c5db4c4c8bb2",
+  "position": {
+    "x": 884,
+    "y": 12,
+    "z": 2000,
+    "height": 60,
+    "width": 184,
+    "tabOrder": 2000
+  },
+  "visual": {
+    "visualType": "slicer",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_geo"
+                    }
+                  },
+                  "Property": "nom_departement"
+                }
+              },
+              "queryRef": "dim_geo.nom_departement",
+              "nativeQueryRef": "nom_departement",
+              "active": true,
+              "displayName": "Département"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "data": [
+        {
+          "properties": {
+            "mode": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Dropdown'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

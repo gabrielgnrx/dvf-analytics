@@ -1,0 +1,113 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "abf1de46fd1847ec8c37",
+  "position": {
+    "x": 648,
+    "y": 212,
+    "z": 8000,
+    "height": 492,
+    "width": 612,
+    "tabOrder": 8000
+  },
+  "visual": {
+    "visualType": "scatterChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_geo"
+                    }
+                  },
+                  "Property": "nom_commune"
+                }
+              },
+              "queryRef": "dim_geo.nom_commune",
+              "nativeQueryRef": "nom_commune",
+              "active": true,
+              "displayName": "Commune"
+            }
+          ]
+        },
+        "X": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_transactions"
+                    }
+                  },
+                  "Property": "Prix m² prédit médian"
+                }
+              },
+              "queryRef": "fact_transactions.Prix m² prédit médian",
+              "nativeQueryRef": "Prix m² prédit médian",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_transactions"
+                    }
+                  },
+                  "Property": "Prix m² réel médian (scoré)"
+                }
+              },
+              "queryRef": "fact_transactions.Prix m² réel médian (scoré)",
+              "nativeQueryRef": "Prix m² réel médian (scoré)"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Prix réel vs prix prédit par commune (€/m², médianes)'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}
