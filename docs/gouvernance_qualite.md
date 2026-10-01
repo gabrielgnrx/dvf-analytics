@@ -60,6 +60,10 @@ du rapport Power BI.
 - Sécurité au niveau des lignes dans Power BI : rôles Paris, Petite couronne et
   Grande couronne, filtre `dim_geo[zone]`. Scénario : un responsable d'agence ne
   voit que son territoire.
+- Contrôle de la RLS (« Afficher comme ») : le rôle Paris ne voit que 204 315
+  ventes, toutes à Paris ; le rôle Grande couronne en voit 393 662, réparties
+  sur les Yvelines, le Val-d'Oise, l'Essonne et la Seine-et-Marne. Ces volumes
+  correspondent exactement aux totaux par département.
 
 ## 6. Limites connues
 
