@@ -1,0 +1,7 @@
+role Paris
+	modelPermission: read
+
+	tablePermission dim_geo = [zone] = "Paris"
+
+	annotation PBI_Id = e3350f86e61c4b99ac13b39acbf79795
+

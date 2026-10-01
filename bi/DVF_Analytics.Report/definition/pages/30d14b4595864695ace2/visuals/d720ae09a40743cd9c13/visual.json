@@ -1,0 +1,51 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.2.0/schema.json",
+  "name": "d720ae09a40743cd9c13",
+  "position": {
+    "x": 20,
+    "y": 50,
+    "z": 1000,
+    "height": 30,
+    "width": 840,
+    "tabOrder": 1000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Modèle LightGBM validé sur 2025 (erreur médiane 13 %), puis réentraîné sur tout l'historique. Écart = (prix réel - prix prédit) / prix prédit.",
+                    "textStyle": {
+                      "fontSize": "10pt",
+                      "color": "#5F6B7A"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

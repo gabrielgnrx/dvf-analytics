@@ -1,0 +1,359 @@
+table fact_transactions
+	lineageTag: 8cdef724-90f3-4a99-8e2e-57fcc0411d6f
+
+	measure 'Nb ventes' = COUNTROWS ( fact_transactions )
+		formatString: #,0
+		displayFolder: Volumes
+		lineageTag: db9117c7-f443-46c3-8df0-70b25d7df96a
+
+	measure 'Volume ventes' = SUM ( fact_transactions[valeur_fonciere] )
+		formatString: #,0
+		displayFolder: Volumes
+		lineageTag: ff9e0475-bf42-4176-b3fc-23d50e386fb5
+
+	measure 'Nb ventes N-1' = CALCULATE ( [Nb ventes], SAMEPERIODLASTYEAR ( dim_temps[date] ) )
+		formatString: #,0
+		displayFolder: Volumes
+		lineageTag: 01b6a30d-3126-48fc-ba29-ad5fa5d3f114
+
+	measure 'Évolution volume' = DIVIDE ( [Nb ventes] - [Nb ventes N-1], [Nb ventes N-1] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: Volumes
+		lineageTag: f152f137-c671-4714-add3-e448186e29f3
+
+	measure 'Prix m² médian' = CALCULATE ( MEDIAN ( fact_transactions[prix_m2] ), fact_transactions[est_prix_m2_fiable] = TRUE () )
+		formatString: #,0
+		displayFolder: Prix
+		lineageTag: 069da2cb-ad94-472b-81e3-f5c958c1528f
+
+	measure 'Prix m² moyen' = CALCULATE ( AVERAGE ( fact_transactions[prix_m2] ), fact_transactions[est_prix_m2_fiable] = TRUE () )
+		formatString: #,0
+		displayFolder: Prix
+		lineageTag: dec1b249-e6e1-4a9a-8d4e-20c9eb8bcc5c
+
+	measure 'Prix médian vente' = CALCULATE ( MEDIAN ( fact_transactions[valeur_fonciere] ), fact_transactions[est_vente_simple] = TRUE () )
+		formatString: #,0
+		displayFolder: Prix
+		lineageTag: 265399b9-7dbc-460d-b6f4-cbe6d0e02f35
+
+	measure 'Surface médiane' = CALCULATE ( MEDIAN ( fact_transactions[surface_habitable] ), fact_transactions[est_vente_simple] = TRUE () )
+		formatString: #,0
+		displayFolder: Prix
+		lineageTag: 9da043cf-8ebf-4aea-9b47-ef1d46f6a269
+
+	measure 'Prix m² médian N-1' = CALCULATE ( [Prix m² médian], SAMEPERIODLASTYEAR ( dim_temps[date] ) )
+		formatString: #,0
+		displayFolder: Prix
+		lineageTag: c138803e-0419-4a80-b869-e8eb64a4372d
+
+	measure 'Évolution prix m²' = DIVIDE ( [Prix m² médian] - [Prix m² médian N-1], [Prix m² médian N-1] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: Prix
+		lineageTag: 496e763f-365f-47d8-a6bf-590048f5bab0
+
+	measure 'Prix m² médian 12 mois glissants' = CALCULATE ( [Prix m² médian], DATESINPERIOD ( dim_temps[date], MAX ( dim_temps[date] ), -12, MONTH ) )
+		formatString: #,0
+		displayFolder: Prix
+		lineageTag: 33132232-f167-4d9d-b5cb-df60b181926e
+
+	measure 'Part ventes fiables' = DIVIDE ( CALCULATE ( [Nb ventes], fact_transactions[est_prix_m2_fiable] = TRUE () ), [Nb ventes] )
+		formatString: 0.0%
+		displayFolder: Qualité
+		lineageTag: 5c162ab2-d962-4c74-9810-35993b67844d
+
+	measure 'Part ventes simples' = DIVIDE ( CALCULATE ( [Nb ventes], fact_transactions[est_vente_simple] = TRUE () ), [Nb ventes] )
+		formatString: 0.0%
+		displayFolder: Qualité
+		lineageTag: 830e3444-b35c-4636-b798-32c6e302793d
+
+	measure 'Nb ventes écartées' = [Nb ventes] - CALCULATE ( [Nb ventes], fact_transactions[est_prix_m2_fiable] = TRUE () )
+		formatString: #,0
+		displayFolder: Qualité
+		lineageTag: 657bfa42-80b3-413c-ba08-abcc2a2fd21c
+
+	measure 'Nb ventes scorées' = COUNTROWS ( mart_ecarts_prix )
+		formatString: #,0
+		displayFolder: Modèle
+		lineageTag: 623ec32d-c43d-4991-bd9a-58a7b019ee12
+
+	measure 'Écart médian au modèle' = DIVIDE ( MEDIAN ( mart_ecarts_prix[ecart_pct] ), 100 )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: Modèle
+		lineageTag: 425bbe28-aa63-402f-9af9-5864ae98420e
+
+	measure 'Écart absolu médian au modèle' = DIVIDE ( MEDIANX ( mart_ecarts_prix, ABS ( mart_ecarts_prix[ecart_pct] ) ), 100 )
+		formatString: 0.0%
+		displayFolder: Modèle
+		lineageTag: ca1b5461-8ec7-42bf-9f91-31d3fb77bc2f
+
+	measure 'Part ventes sous le marché' = DIVIDE ( CALCULATE ( COUNTROWS ( mart_ecarts_prix ), mart_ecarts_prix[ecart_pct] <= -10 ), COUNTROWS ( mart_ecarts_prix ) )
+		formatString: 0.0%
+		displayFolder: Modèle
+		lineageTag: f55bfeca-51e6-44f9-87f1-6af935cf85f0
+
+	measure 'Prix m² prédit médian' = MEDIAN ( mart_ecarts_prix[prix_m2_predit] )
+		formatString: #,0
+		displayFolder: Modèle
+		lineageTag: c42f6d64-1e34-42b2-b7cb-9440777ebf47
+
+	measure 'Prix m² réel médian (scoré)' = MEDIAN ( mart_ecarts_prix[prix_m2] )
+		formatString: #,0
+		displayFolder: Modèle
+		lineageTag: 8c6f336d-5372-478a-a1ce-d052800ec33c
+
+	measure 'Évolution prix m² (12 mois)' = VAR fin = MAX ( fact_transactions[date_mutation] ) VAR cur = CALCULATE ( [Prix m² médian], DATESINPERIOD ( dim_temps[date], fin, -12, MONTH ) ) VAR prev = CALCULATE ( [Prix m² médian], DATESINPERIOD ( dim_temps[date], EDATE ( fin, -12 ), -12, MONTH ) ) RETURN DIVIDE ( cur - prev, prev )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: Prix
+		lineageTag: cbf45340-79af-4134-813d-3344f02c7858
+
+	column transaction_id
+		dataType: string
+		isHidden
+		sourceProviderType: nvarchar(16384)
+		lineageTag: a13a261a-3ee5-447c-960e-2a0b3717ecc3
+		summarizeBy: none
+		sourceColumn: transaction_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column date_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: c2c4e81c-02d5-4c6c-ad8f-c29c8faf50c7
+		summarizeBy: sum
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column geo_key
+		dataType: string
+		isHidden
+		sourceProviderType: nvarchar(16384)
+		lineageTag: e890f4ec-e5e0-4b13-8e4d-378c69624f29
+		summarizeBy: none
+		sourceColumn: geo_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column bien_key
+		dataType: string
+		isHidden
+		sourceProviderType: nvarchar(16384)
+		lineageTag: 34a4495d-6f02-4b8d-a8a0-4b33be041fcd
+		summarizeBy: none
+		sourceColumn: bien_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column date_mutation
+		dataType: dateTime
+		formatString: Long Date
+		sourceProviderType: date
+		lineageTag: e42f26a9-edea-40bf-a795-919fd2e35f79
+		summarizeBy: none
+		sourceColumn: date_mutation
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column code_departement
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: 3df8a92c-eb03-4616-ae69-6ca36ba0e3af
+		summarizeBy: none
+		sourceColumn: code_departement
+
+		annotation SummarizationSetBy = Automatic
+
+	column type_bien
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: 4d5c2ac6-141e-4b5d-98cc-634fa69ef350
+		summarizeBy: none
+		sourceColumn: type_bien
+
+		annotation SummarizationSetBy = Automatic
+
+	column valeur_fonciere
+		dataType: double
+		sourceProviderType: double
+		lineageTag: d4023ed7-d5c1-4cbb-9a5a-ace883d50469
+		summarizeBy: sum
+		sourceColumn: valeur_fonciere
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column surface_habitable
+		dataType: double
+		sourceProviderType: double
+		lineageTag: 74169ab0-15dd-4619-aa4a-c5852b1ec14f
+		summarizeBy: sum
+		sourceColumn: surface_habitable
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column surface_terrain
+		dataType: double
+		sourceProviderType: double
+		lineageTag: 4a4109f9-d705-4903-a550-acd311e765ca
+		summarizeBy: sum
+		sourceColumn: surface_terrain
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column nb_pieces
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 626cdac1-02eb-4671-9af2-b8cbc1516846
+		summarizeBy: sum
+		sourceColumn: nb_pieces
+
+		annotation SummarizationSetBy = Automatic
+
+	column nb_appartements
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 500dd903-4447-42fd-882e-15ec05dc53d8
+		summarizeBy: sum
+		sourceColumn: nb_appartements
+
+		annotation SummarizationSetBy = Automatic
+
+	column nb_maisons
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: a6d217f7-bba5-44cd-bdb7-20bee78c22de
+		summarizeBy: sum
+		sourceColumn: nb_maisons
+
+		annotation SummarizationSetBy = Automatic
+
+	column nb_dependances
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 019c4e22-fdca-40fc-b29e-d214823435d6
+		summarizeBy: sum
+		sourceColumn: nb_dependances
+
+		annotation SummarizationSetBy = Automatic
+
+	column nb_locaux_activite
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 17f90bec-4139-4127-beb7-8bf1dc64cceb
+		summarizeBy: sum
+		sourceColumn: nb_locaux_activite
+
+		annotation SummarizationSetBy = Automatic
+
+	column nb_parcelles
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 8e81e2f5-aeb7-4c1a-9f59-03e42c1101f0
+		summarizeBy: sum
+		sourceColumn: nb_parcelles
+
+		annotation SummarizationSetBy = Automatic
+
+	column nombre_lots
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 0cf72c8d-d9f5-4d4c-a435-457ae75e1ee6
+		summarizeBy: sum
+		sourceColumn: nombre_lots
+
+		annotation SummarizationSetBy = Automatic
+
+	column prix_m2
+		dataType: double
+		sourceProviderType: double
+		lineageTag: 5e7072c0-c903-4f22-8417-c1ee206a8d6f
+		summarizeBy: sum
+		sourceColumn: prix_m2
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column est_vente_simple
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: 0df0da45-0e7e-4020-a4a9-1ac5f1fe0577
+		summarizeBy: none
+		sourceColumn: est_vente_simple
+
+		annotation SummarizationSetBy = Automatic
+
+	column est_prix_m2_fiable
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: d6ee780a-efea-4527-98cf-511f24568874
+		summarizeBy: none
+		sourceColumn: est_prix_m2_fiable
+
+		annotation SummarizationSetBy = Automatic
+
+	column latitude
+		dataType: double
+		sourceProviderType: double
+		lineageTag: ceff2154-a001-45a2-913f-14c4cf2d25db
+		summarizeBy: sum
+		sourceColumn: latitude
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column longitude
+		dataType: double
+		sourceProviderType: double
+		lineageTag: 30265dfb-077d-4934-80f3-575260d0c60f
+		summarizeBy: sum
+		sourceColumn: longitude
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column nb_lignes_source
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: f50bf78b-22a5-47c4-b9bd-b3ccda9ba207
+		summarizeBy: sum
+		sourceColumn: nb_lignes_source
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_transactions = m
+		mode: import
+		source =
+				let
+				    Source = GoogleBigQuery.Database(),
+				    #"data-510311" = Source{[Name="data-510311"]}[Data],
+				    analytics_marts_Schema = #"data-510311"{[Name="analytics_marts",Kind="Schema"]}[Data],
+				    fact_transactions_Table = analytics_marts_Schema{[Name="fact_transactions",Kind="Table"]}[Data]
+				in
+				    fact_transactions_Table
+
+	annotation PBI_ResultType = Table
+

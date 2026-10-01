@@ -1,0 +1,7 @@
+role 'Petite couronne'
+	modelPermission: read
+
+	tablePermission dim_geo = [zone] = "Petite couronne"
+
+	annotation PBI_Id = 69f95913342c4f9b85286735bfd5339a
+

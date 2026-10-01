@@ -1,0 +1,142 @@
+table mart_ecarts_prix
+	lineageTag: 3cf5829b-b3b5-45cf-856d-eb96bfb32de1
+
+	column transaction_id
+		dataType: string
+		isHidden
+		sourceProviderType: nvarchar(16384)
+		lineageTag: 813551bd-3a50-41a1-8f92-e2b077696cac
+		summarizeBy: none
+		sourceColumn: transaction_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column date_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 8f8e8369-87ad-467f-98b3-d838da45fa59
+		summarizeBy: sum
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column geo_key
+		dataType: string
+		isHidden
+		sourceProviderType: nvarchar(16384)
+		lineageTag: 65cfaa34-ee1c-462b-8c6a-ceb7d743c023
+		summarizeBy: none
+		sourceColumn: geo_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column bien_key
+		dataType: string
+		isHidden
+		sourceProviderType: nvarchar(16384)
+		lineageTag: 182858f6-1b00-4f35-ba08-99961b5fb2c2
+		summarizeBy: none
+		sourceColumn: bien_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column date_mutation
+		dataType: dateTime
+		formatString: Long Date
+		sourceProviderType: date
+		lineageTag: a46b0130-507d-4e28-9c45-2c698c8e6713
+		summarizeBy: none
+		sourceColumn: date_mutation
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column type_bien
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: 32460937-4af9-4844-a4b9-a8af90fb5df7
+		summarizeBy: none
+		sourceColumn: type_bien
+
+		annotation SummarizationSetBy = Automatic
+
+	column surface_habitable
+		dataType: double
+		sourceProviderType: double
+		lineageTag: 7f436f0a-8de4-4837-9e70-1338dd2a3aab
+		summarizeBy: sum
+		sourceColumn: surface_habitable
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column valeur_fonciere
+		dataType: double
+		sourceProviderType: double
+		lineageTag: f112ffa5-0576-4803-8fff-3e848e0fc9cc
+		summarizeBy: sum
+		sourceColumn: valeur_fonciere
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column prix_m2
+		dataType: double
+		sourceProviderType: double
+		lineageTag: 8c6f3ae9-2e91-43e4-829c-4e53abee23e4
+		summarizeBy: sum
+		sourceColumn: prix_m2
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column prix_m2_predit
+		dataType: double
+		sourceProviderType: double
+		lineageTag: fedbce43-5027-4558-bf01-68476a4b18ff
+		summarizeBy: sum
+		sourceColumn: prix_m2_predit
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ecart_pct
+		dataType: double
+		sourceProviderType: double
+		lineageTag: 0b008c8c-3272-4091-96a0-d3f6ddc25754
+		summarizeBy: sum
+		sourceColumn: ecart_pct
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column positionnement_prix
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: 2c7ea7b4-fac6-4cfa-8ce8-a6699b9fd954
+		summarizeBy: none
+		sourceColumn: positionnement_prix
+
+		annotation SummarizationSetBy = Automatic
+
+	partition mart_ecarts_prix = m
+		mode: import
+		source =
+				let
+				    Source = GoogleBigQuery.Database(),
+				    #"data-510311" = Source{[Name="data-510311"]}[Data],
+				    analytics_marts_Schema = #"data-510311"{[Name="analytics_marts",Kind="Schema"]}[Data],
+				    mart_ecarts_prix_Table = analytics_marts_Schema{[Name="mart_ecarts_prix",Kind="Table"]}[Data]
+				in
+				    mart_ecarts_prix_Table
+
+	annotation PBI_ResultType = Table
+

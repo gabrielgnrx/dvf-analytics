@@ -1,0 +1,63 @@
+table dim_bien
+	lineageTag: 2ea2857e-40c5-496b-83ef-53413b50646b
+
+	column bien_key
+		dataType: string
+		isHidden
+		sourceProviderType: nvarchar(16384)
+		lineageTag: b3710a8d-f233-4739-b43f-5dd0a7d501ff
+		summarizeBy: none
+		sourceColumn: bien_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column type_bien
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: 8af48678-99bd-4761-af64-e38d761105f3
+		summarizeBy: none
+		sourceColumn: type_bien
+
+		annotation SummarizationSetBy = Automatic
+
+	column classe_pieces
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: db5b759e-0492-467f-bf08-827f65d4d502
+		summarizeBy: none
+		sourceColumn: classe_pieces
+
+		annotation SummarizationSetBy = Automatic
+
+	column tranche_surface
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: a88bb58f-a8d3-4f77-b557-ff3b7f699122
+		summarizeBy: none
+		sourceColumn: tranche_surface
+
+		annotation SummarizationSetBy = Automatic
+
+	column est_logement
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: 981ee730-1467-486d-8e64-3100c714c472
+		summarizeBy: none
+		sourceColumn: est_logement
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_bien = m
+		mode: import
+		source =
+				let
+				    Source = GoogleBigQuery.Database(),
+				    #"data-510311" = Source{[Name="data-510311"]}[Data],
+				    analytics_marts_Schema = #"data-510311"{[Name="analytics_marts",Kind="Schema"]}[Data],
+				    dim_bien_Table = analytics_marts_Schema{[Name="dim_bien",Kind="Table"]}[Data]
+				in
+				    dim_bien_Table
+
+	annotation PBI_ResultType = Table
+

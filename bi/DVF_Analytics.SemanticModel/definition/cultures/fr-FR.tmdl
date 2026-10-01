@@ -1,0 +1,221 @@
+cultureInfo fr-FR
+
+	linguisticMetadata =
+			{
+			  "Version": "2.0.0",
+			  "Language": "en-US",
+			  "Entities": {
+			    "fact_transactions.évolution_prix_m_12_mois": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "fact_transactions",
+			          "ConceptualProperty": "Évolution prix m² (12 mois)"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Évolution 12 mois": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "fact_transactions.type_bien": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "fact_transactions",
+			          "ConceptualProperty": "type_bien"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Type de bien": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_geo.zone": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "dim_geo",
+			          "ConceptualProperty": "zone"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Zone": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_geo.nom_departement": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "dim_geo",
+			          "ConceptualProperty": "nom_departement"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Département": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_geo.nom_commune": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "dim_geo",
+			          "ConceptualProperty": "nom_commune"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Commune": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_temps.annee": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "dim_temps",
+			          "ConceptualProperty": "annee"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Année": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_temps.annee_trimestre": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "dim_temps",
+			          "ConceptualProperty": "annee_trimestre"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Trimestre": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_bien.classe_pieces": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "dim_bien",
+			          "ConceptualProperty": "classe_pieces"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Pièces": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_bien.type_bien": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "dim_bien",
+			          "ConceptualProperty": "type_bien"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Type de bien": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "mart_ecarts_prix.positionnement_prix": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "mart_ecarts_prix",
+			          "ConceptualProperty": "positionnement_prix"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Position / modèle": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    }
+			  }
+			}
+		contentType: json
+

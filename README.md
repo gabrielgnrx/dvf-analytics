@@ -56,7 +56,7 @@ Détail dans `SETUP.md`.
 - [x] Semaine 1 — Socle : ingestion + raw dans BigQuery + dbt connecté + profilage
 - [x] Semaine 2 — Transformation : staging + intermediate + schéma étoile + tests (premier jet)
 - [x] Semaine 3 — Data science : modèle prix au m², méthodo, analyse d'erreur (voir `docs/resultats_modele.md`)
-- [ ] Semaine 4 — BI : modèle sémantique Power BI, DAX, dashboards
+- [x] Semaine 4 — BI : modèle sémantique Power BI (import, étoile, 21 mesures DAX, 3 rôles RLS), rapport 4 pages (`bi/DVF_Analytics.pbip`)
 - [ ] Semaine 5 — Gouvernance + RLS + rapport qualité
 - [ ] Semaine 6 — Finitions : doc, démo Loom, scale national (optionnel)
 

@@ -1,0 +1,220 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.2.0/schema.json",
+  "name": "0001c015e4fc4d97a5a5",
+  "position": {
+    "x": 20,
+    "y": 405,
+    "z": 7000,
+    "height": 300,
+    "width": 1240,
+    "tabOrder": 7000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_geo"
+                    }
+                  },
+                  "Property": "nom_commune"
+                }
+              },
+              "queryRef": "dim_geo.nom_commune",
+              "nativeQueryRef": "nom_commune",
+              "displayName": "Commune"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_geo"
+                    }
+                  },
+                  "Property": "nom_departement"
+                }
+              },
+              "queryRef": "dim_geo.nom_departement",
+              "nativeQueryRef": "nom_departement",
+              "displayName": "Département"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_transactions"
+                    }
+                  },
+                  "Property": "Nb ventes"
+                }
+              },
+              "queryRef": "fact_transactions.Nb ventes",
+              "nativeQueryRef": "Nb ventes"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_transactions"
+                    }
+                  },
+                  "Property": "Prix m² médian"
+                }
+              },
+              "queryRef": "fact_transactions.Prix m² médian",
+              "nativeQueryRef": "Prix m² médian"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_transactions"
+                    }
+                  },
+                  "Property": "Évolution prix m² (12 mois)"
+                }
+              },
+              "queryRef": "fact_transactions.Évolution prix m² (12 mois)",
+              "nativeQueryRef": "Évolution prix m² (12 mois)",
+              "displayName": "Évolution 12 mois"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_transactions"
+                    }
+                  },
+                  "Property": "Surface médiane"
+                }
+              },
+              "queryRef": "fact_transactions.Surface médiane",
+              "nativeQueryRef": "Surface médiane"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_transactions"
+                    }
+                  },
+                  "Property": "Prix médian vente"
+                }
+              },
+              "queryRef": "fact_transactions.Prix médian vente",
+              "nativeQueryRef": "Prix médian vente"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "fact_transactions"
+                  }
+                },
+                "Property": "Prix m² médian"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "values": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "columnHeaders": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "total": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Communes classées par prix médian au m²'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

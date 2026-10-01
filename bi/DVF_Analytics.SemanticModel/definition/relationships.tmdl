@@ -1,0 +1,24 @@
+relationship ea54ac1e-1033-4010-8c38-a4908ba702e2
+	fromColumn: fact_transactions.date_key
+	toColumn: dim_temps.date_key
+
+relationship 3ab1fc12-83d4-4b54-a072-ec34876beb04
+	fromColumn: fact_transactions.geo_key
+	toColumn: dim_geo.geo_key
+
+relationship 672850fd-c317-4456-b90f-049706286c3e
+	fromColumn: fact_transactions.bien_key
+	toColumn: dim_bien.bien_key
+
+relationship 20d8dcbc-3c7d-452f-8d13-8bad2856e91b
+	fromColumn: mart_ecarts_prix.date_key
+	toColumn: dim_temps.date_key
+
+relationship 14dcef9c-3c26-4fb4-9eee-7f0a3a0c7dc7
+	fromColumn: mart_ecarts_prix.geo_key
+	toColumn: dim_geo.geo_key
+
+relationship ccc76aa2-8303-44e5-a3e4-2bd9b21da813
+	fromColumn: mart_ecarts_prix.bien_key
+	toColumn: dim_bien.bien_key
+

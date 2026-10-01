@@ -1,0 +1,115 @@
+table dim_geo
+	lineageTag: ff291cbd-d0da-46fe-81f2-14ab395bdb39
+
+	column geo_key
+		dataType: string
+		isHidden
+		sourceProviderType: nvarchar(16384)
+		lineageTag: db64981a-f141-410b-ad5e-2419cd28918f
+		summarizeBy: none
+		sourceColumn: geo_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column code_commune
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: 9be3b654-41fb-4604-bc37-bc86ea986313
+		summarizeBy: none
+		sourceColumn: code_commune
+
+		annotation SummarizationSetBy = Automatic
+
+	column nom_commune
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: 3f6bb715-75f5-42f0-b850-6c47c0d02cbe
+		dataCategory: City
+		summarizeBy: none
+		sourceColumn: nom_commune
+
+		annotation SummarizationSetBy = Automatic
+
+	column code_postal_principal
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: 23c09d52-53fc-42e8-885c-6f6d83b6ca2b
+		summarizeBy: none
+		sourceColumn: code_postal_principal
+
+		annotation SummarizationSetBy = Automatic
+
+	column code_departement
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: 374dd0fc-a80d-4384-b396-048c660abad0
+		summarizeBy: none
+		sourceColumn: code_departement
+
+		annotation SummarizationSetBy = Automatic
+
+	column nom_departement
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: c4cdc4f8-e8d3-4b8c-b5d0-5982559f5fec
+		summarizeBy: none
+		sourceColumn: nom_departement
+
+		annotation SummarizationSetBy = Automatic
+
+	column zone
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: dd9493bb-665b-4060-8867-49591defd9eb
+		summarizeBy: none
+		sourceColumn: zone
+
+		annotation SummarizationSetBy = Automatic
+
+	column latitude
+		dataType: double
+		sourceProviderType: double
+		lineageTag: ed451047-3238-41c5-adc9-04988ba7cba2
+		dataCategory: Latitude
+		summarizeBy: sum
+		sourceColumn: latitude
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column longitude
+		dataType: double
+		sourceProviderType: double
+		lineageTag: 8b6907e6-687b-40d7-bdb4-c065518a1296
+		dataCategory: Longitude
+		summarizeBy: sum
+		sourceColumn: longitude
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column centroide
+		dataType: string
+		isHidden
+		sourceProviderType: nvarchar(16384)
+		lineageTag: 239c14e7-fee1-4e42-8b1f-d8e74dabae4c
+		summarizeBy: none
+		sourceColumn: centroide
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_geo = m
+		mode: import
+		source =
+				let
+				    Source = GoogleBigQuery.Database(),
+				    #"data-510311" = Source{[Name="data-510311"]}[Data],
+				    analytics_marts_Schema = #"data-510311"{[Name="analytics_marts",Kind="Schema"]}[Data],
+				    dim_geo_Table = analytics_marts_Schema{[Name="dim_geo",Kind="Table"]}[Data]
+				in
+				    dim_geo_Table
+
+	annotation PBI_ResultType = Table
+

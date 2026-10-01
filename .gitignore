@@ -33,3 +33,10 @@ exploration/output/
 
 # Seeds dbt (référentiels versionnés)
 !dbt/dvf/seeds/*.csv
+
+# Power BI : cache de données et réglages locaux
+**/.pbi/cache.abf
+**/.pbi/localSettings.json
+!bi/**/*.json
+**/.pbi/localSettings.json
+**/.pbi/cache.abf

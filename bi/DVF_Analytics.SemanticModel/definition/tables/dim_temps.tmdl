@@ -1,0 +1,129 @@
+table dim_temps
+	lineageTag: 15ff17a0-1aea-433c-99cd-5c51faa2ccad
+	dataCategory: Time
+
+	column date_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: fae8ad13-a60a-4df0-8260-9c302e69c97e
+		summarizeBy: sum
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column date
+		dataType: dateTime
+		isKey
+		formatString: Long Date
+		sourceProviderType: date
+		lineageTag: f6a30353-7b71-4290-85ba-534a0d61f12b
+		summarizeBy: none
+		sourceColumn: date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column annee
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 29c376ac-fd7e-4209-9873-6595ddf0c2f4
+		summarizeBy: none
+		sourceColumn: annee
+
+		annotation SummarizationSetBy = Automatic
+
+	column trimestre
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: f6bb71d1-fdf5-4004-97ae-1624cd3e1e42
+		summarizeBy: none
+		sourceColumn: trimestre
+
+		annotation SummarizationSetBy = Automatic
+
+	column annee_trimestre
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: 617a0d64-ced8-402c-875d-24ec004cf390
+		summarizeBy: none
+		sourceColumn: annee_trimestre
+
+		annotation SummarizationSetBy = Automatic
+
+	column mois
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 826d2b13-a84c-441d-aca1-3ae4f77f2015
+		summarizeBy: none
+		sourceColumn: mois
+
+		annotation SummarizationSetBy = Automatic
+
+	column annee_mois
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: b8702311-8898-4853-a596-014c43102b31
+		summarizeBy: none
+		sourceColumn: annee_mois
+
+		annotation SummarizationSetBy = Automatic
+
+	column nom_mois
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: 81c2f285-1bd7-4615-a9ff-843f85f3ff2e
+		summarizeBy: none
+		sourceColumn: nom_mois
+		sortByColumn: mois
+
+		annotation SummarizationSetBy = Automatic
+
+	column semestre
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: c2c83296-6249-425d-b0c5-fe5f67114d30
+		summarizeBy: none
+		sourceColumn: semestre
+
+		annotation SummarizationSetBy = Automatic
+
+	column semaine_iso
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 931fec75-d47b-492b-917a-56a60d57588a
+		summarizeBy: none
+		sourceColumn: semaine_iso
+
+		annotation SummarizationSetBy = Automatic
+
+	column est_weekend
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: f91a8845-b018-41a1-9e7f-12f659baf501
+		summarizeBy: none
+		sourceColumn: est_weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_temps = m
+		mode: import
+		source =
+				let
+				    Source = GoogleBigQuery.Database(),
+				    #"data-510311" = Source{[Name="data-510311"]}[Data],
+				    analytics_marts_Schema = #"data-510311"{[Name="analytics_marts",Kind="Schema"]}[Data],
+				    dim_temps_Table = analytics_marts_Schema{[Name="dim_temps",Kind="Table"]}[Data]
+				in
+				    dim_temps_Table
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,26 @@
+model Model
+	culture: fr-FR
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: fr-FR
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation PBI_QueryOrder = ["dim_bien","dim_geo","dim_temps","fact_transactions","mart_ecarts_prix"]
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table dim_bien
+ref table dim_geo
+ref table dim_temps
+ref table fact_transactions
+ref table mart_ecarts_prix
+
+ref role Paris
+ref role 'Petite couronne'
+ref role 'Grande couronne'
+
+ref cultureInfo fr-FR
+
