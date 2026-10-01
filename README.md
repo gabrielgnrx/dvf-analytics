@@ -57,7 +57,7 @@ Détail dans `SETUP.md`.
 - [x] Semaine 2 — Transformation : staging + intermediate + schéma étoile + tests (premier jet)
 - [x] Semaine 3 — Data science : modèle prix au m², méthodo, analyse d'erreur (voir `docs/resultats_modele.md`)
 - [x] Semaine 4 — BI : modèle sémantique Power BI (import, étoile, 21 mesures DAX, 3 rôles RLS), rapport 4 pages (`bi/DVF_Analytics.pbip`)
-- [ ] Semaine 5 — Gouvernance + RLS + rapport qualité
+- [x] Semaine 5 — Gouvernance : lignage, règles, tests, indicateurs qualité, RLS (`docs/gouvernance_qualite.md`)
 - [ ] Semaine 6 — Finitions : doc, démo Loom, scale national (optionnel)
 
 ## Premiers résultats (Île-de-France, 2021 à 2025)

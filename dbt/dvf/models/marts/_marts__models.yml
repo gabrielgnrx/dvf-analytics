@@ -5,26 +5,31 @@ models:
     description: "Table de faits des ventes immobilières, grain = une mutation."
     columns:
       - name: transaction_id
+        description: "Identifiant DVF de la mutation (grain de la table)."
         tests: [unique, not_null]
       - name: date_key
+        description: "Date de la vente au format AAAAMMJJ, clé vers dim_temps."
         tests:
           - not_null
           - relationships:
               to: ref('dim_temps')
               field: date_key
       - name: geo_key
+        description: "Code INSEE de la commune majoritaire de la mutation, clé vers dim_geo."
         tests:
           - not_null
           - relationships:
               to: ref('dim_geo')
               field: geo_key
       - name: bien_key
+        description: "Clé de substitution type x pièces x tranche de surface, vers dim_bien."
         tests:
           - not_null
           - relationships:
               to: ref('dim_bien')
               field: bien_key
       - name: valeur_fonciere
+        description: "Prix de vente en euros, compté une seule fois par mutation."
         tests:
           - dbt_utils.accepted_range:
               min_value: 0
@@ -40,6 +45,12 @@ models:
               inclusive: false
               config:
                 severity: warn
+      - name: est_vente_simple
+        description: "Vrai si la mutation porte sur un seul logement (dépendances tolérées), sans local d'activité, avec une seule valeur foncière."
+      - name: est_prix_m2_fiable
+        description: "Vrai si le prix au m² existe et se situe entre 1 000 et 30 000 euros."
+      - name: type_bien
+        description: "Appartement, Maison, Multi-logements, Local commercial, Dépendance seule, Terrain / non bâti."
 
   - name: dim_geo
     description: "Dimension commune (arrondissement pour Paris), avec département et zone."
