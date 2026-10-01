@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: int_dvf__mutations
+    description: >
+      Mutations DVF agrégées au grain mutation. Résout la répétition de la
+      valeur foncière sur les lignes multi-locaux et qualifie chaque vente
+      (type de bien, vente simple ou non).
+    columns:
+      - name: id_mutation
+        tests: [unique, not_null]
+      - name: valeur_fonciere
+        tests: [not_null]
+      - name: type_bien
+        tests:
+          - accepted_values:
+              values: ['Appartement', 'Maison', 'Multi-logements', 'Local commercial', 'Dépendance seule', 'Terrain / non bâti']
