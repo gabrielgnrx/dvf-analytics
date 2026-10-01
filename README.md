@@ -26,7 +26,7 @@ Périmètre initial : Île-de-France (départements 75, 77, 78, 91, 92, 93, 94, 
   │ (ingestion)    │    │   ├─ dim_temps            │    ┌──────────────────┐
   └────────────────┘    │   └─ dim_bien             │───►│  Modèle ML        │
                          │                           │    │  (prix au m²,     │
-                         │  + tests dbt (qualité)    │    │   XGBoost)        │
+                         │  + tests dbt (qualité)    │    │   LightGBM)       │
                          └──────────────────────────┘    └──────────────────┘
 ```
 
