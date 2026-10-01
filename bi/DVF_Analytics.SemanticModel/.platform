@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "DVF_Analytics"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "07a3d921-f2d9-4998-b89b-a0c7d8da8ca3"
+  }
+}
