@@ -1,0 +1,31 @@
+version: 2
+
+models:
+  - name: stg_dvf__mutations
+    description: >
+      Mutations DVF typées et filtrées (ventes uniquement, valeur foncière
+      strictement positive, date valide). Grain : une ligne du fichier source.
+    columns:
+      - name: id_mutation
+        description: "Identifiant de mutation (non unique à ce grain : multi-lignes possibles)."
+        tests:
+          - not_null
+      - name: date_mutation
+        tests:
+          - not_null
+      - name: valeur_fonciere
+        description: "Valeur foncière en euros, > 0."
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: false
+      - name: nature_mutation
+        tests:
+          - accepted_values:
+              values: ['Vente']
+      - name: code_departement
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['75', '77', '78', '91', '92', '93', '94', '95']

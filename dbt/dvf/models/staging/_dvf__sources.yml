@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: raw
+    database: "{{ env_var('GCP_PROJECT_ID', 'ton-projet-gcp') }}"
+    schema: raw
+    description: "Données geo-dvf atterries brutes, tout en STRING."
+    tables:
+      - name: dvf_mutations
+        description: "Transactions immobilières DVF géolocalisées, non nettoyées."
+        columns:
+          - name: id_mutation
+            description: "Identifiant de la mutation (peut couvrir plusieurs lignes)."
