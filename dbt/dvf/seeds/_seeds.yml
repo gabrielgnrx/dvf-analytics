@@ -1,0 +1,11 @@
+version: 2
+
+seeds:
+  - name: ref_departements
+    description: "Référentiel des départements d'Île-de-France et de leur zone (Paris, petite et grande couronne)."
+    config:
+      column_types:
+        code_departement: string
+    columns:
+      - name: code_departement
+        tests: [unique, not_null]
