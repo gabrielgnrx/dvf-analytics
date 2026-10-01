@@ -1,0 +1,56 @@
+// Mesures DAX du modèle sémantique DVF (table de mesures : _Mesures)
+// Toutes les mesures de prix au m² portent sur les ventes fiables uniquement.
+
+Nb ventes =
+COUNTROWS ( fact_transactions )
+
+Volume ventes (€) =
+SUM ( fact_transactions[valeur_fonciere] )
+
+Prix m² médian =
+CALCULATE (
+    MEDIAN ( fact_transactions[prix_m2] ),
+    fact_transactions[est_prix_m2_fiable] = TRUE ()
+)
+
+Prix m² moyen =
+CALCULATE (
+    AVERAGE ( fact_transactions[prix_m2] ),
+    fact_transactions[est_prix_m2_fiable] = TRUE ()
+)
+
+Surface médiane =
+CALCULATE (
+    MEDIAN ( fact_transactions[surface_habitable] ),
+    fact_transactions[est_vente_simple] = TRUE ()
+)
+
+Prix m² médian N-1 =
+CALCULATE ( [Prix m² médian], SAMEPERIODLASTYEAR ( dim_temps[date] ) )
+
+Évolution prix m² % =
+DIVIDE ( [Prix m² médian] - [Prix m² médian N-1], [Prix m² médian N-1] )
+
+Nb ventes N-1 =
+CALCULATE ( [Nb ventes], SAMEPERIODLASTYEAR ( dim_temps[date] ) )
+
+Évolution volume % =
+DIVIDE ( [Nb ventes] - [Nb ventes N-1], [Nb ventes N-1] )
+
+Part ventes fiables % =
+DIVIDE (
+    CALCULATE ( [Nb ventes], fact_transactions[est_prix_m2_fiable] = TRUE () ),
+    [Nb ventes]
+)
+
+Prix m² médian 12 mois glissants =
+CALCULATE (
+    [Prix m² médian],
+    DATESINPERIOD ( dim_temps[date], MAX ( dim_temps[date] ), -12, MONTH )
+)
+
+Écart médian au modèle % =
+MEDIAN ( mart_ecarts_prix[ecart_pct] ) / 100
+
+Rang commune prix m² =
+RANKX ( ALLSELECTED ( dim_geo[nom_commune] ), [Prix m² médian], , DESC, DENSE )
