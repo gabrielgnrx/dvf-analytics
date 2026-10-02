@@ -39,6 +39,7 @@ Périmètre initial : Île-de-France (départements 75, 77, 78, 91, 92, 93, 94, 
 | Qualité | tests dbt + `exploration/` | Gouvernance / data quality |
 | Data science | `ml/` | Modélisation, méthodo ML |
 | BI | `bi/` + Power BI | Modélisation dimensionnelle, DAX, RLS |
+| Orchestration | `airflow/` | Airflow + Cosmos, Docker, contrôle qualité bloquant |
 
 ## Démarrage rapide
 
@@ -58,7 +59,8 @@ Détail dans `SETUP.md`.
 - [x] Semaine 3 — Data science : modèle prix au m², méthodo, analyse d'erreur (voir `docs/resultats_modele.md`)
 - [x] Semaine 4 — BI : modèle sémantique Power BI (import, étoile, 21 mesures DAX, 3 rôles RLS), rapport 4 pages (`bi/DVF_Analytics.pbip`)
 - [x] Semaine 5 — Gouvernance : lignage, règles, tests, indicateurs qualité, RLS (`docs/gouvernance_qualite.md`)
-- [ ] Semaine 6 — Finitions : doc, démo Loom, scale national (optionnel)
+- [x] Orchestration : pipeline mensuel Airflow (Docker + Cosmos), voir `airflow/README.md`
+- [ ] Semaine 6 — Finitions : démo vidéo, scale national (optionnel)
 
 ## Premiers résultats (Île-de-France, 2021 à 2025)
 

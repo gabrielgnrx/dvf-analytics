@@ -1,0 +1,109 @@
+# Orchestration locale du pipeline DVF Analytics avec Airflow (LocalExecutor).
+#
+# Première utilisation :
+#   1. docker compose build
+#   2. docker compose run --rm gcloud-auth      (connexion Google, une seule fois)
+#   3. docker compose up -d
+#   4. http://localhost:8080
+name: dvf-airflow
+
+x-airflow-common: &airflow-common
+  build: .
+  image: dvf-airflow:local
+  env_file: .env
+  environment: &airflow-env
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
+    AIRFLOW__CORE__DEFAULT_TIMEZONE: Europe/Paris
+    AIRFLOW__WEBSERVER__DEFAULT_UI_TIMEZONE: Europe/Paris
+    AIRFLOW__WEBSERVER__SECRET_KEY: dvf-analytics-local-only
+    AIRFLOW__SCHEDULER__MIN_FILE_PROCESS_INTERVAL: "60"
+    # Cosmos exécute dbt deps + dbt ls au premier parsing (mis en cache ensuite)
+    AIRFLOW__CORE__DAGBAG_IMPORT_TIMEOUT: "300"
+    AIRFLOW__CORE__DAG_FILE_PROCESSOR_TIMEOUT: "600"
+    # Les DatasetAlias de Cosmos entrent en conflit avec Airflow 2.10 (FlushError)
+    AIRFLOW__COSMOS__ENABLE_DATASET_ALIAS: "false"
+    # Code du projet (ingestion, ml) importable depuis les DAGs
+    PYTHONPATH: /opt/airflow/project
+    DVF_DATA_DIR: /opt/airflow/data/raw
+    ML_OUTPUT_DIR: /opt/airflow/data/ml_output
+    DVF_PROJECT_DIR: /opt/airflow/project
+    DBT_PROFILES_DIR: /opt/airflow/dbt_profiles
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - ./logs:/opt/airflow/logs
+    - ./data:/opt/airflow/data
+    - ./dbt_profiles:/opt/airflow/dbt_profiles
+    - ..:/opt/airflow/project
+    - gcloud-config:/home/airflow/.config/gcloud:ro
+  user: "${AIRFLOW_UID:-50000}:0"
+  depends_on:
+    postgres:
+      condition: service_healthy
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      retries: 5
+    restart: unless-stopped
+
+  airflow-init:
+    <<: *airflow-common
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        airflow db migrate &&
+        airflow users create --role Admin --username "$${AIRFLOW_ADMIN_USER}" --password "$${AIRFLOW_ADMIN_PASSWORD}" \
+          --firstname Admin --lastname DVF --email admin@example.com || true
+    restart: "no"
+
+  airflow-webserver:
+    <<: *airflow-common
+    command: webserver
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+    restart: unless-stopped
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+
+  # Connexion Google (OAuth) stockée dans un volume Docker, partagée en lecture
+  # seule avec Airflow. À lancer une fois : docker compose run --rm gcloud-auth
+  gcloud-auth:
+    image: google/cloud-sdk:slim
+    profiles: ["auth"]
+    env_file: .env
+    volumes:
+      - gcloud-config:/root/.config/gcloud
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        gcloud auth application-default login --no-launch-browser &&
+        gcloud auth application-default set-quota-project "$${GCP_PROJECT_ID}" &&
+        chmod -R a+rX /root/.config/gcloud &&
+        echo "Connexion Google enregistrée."
+
+volumes:
+  postgres-db:
+  gcloud-config:

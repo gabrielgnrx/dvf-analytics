@@ -19,6 +19,7 @@ Usage : python -m ml.train_prix_m2
 """
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import lightgbm as lgb
@@ -29,7 +30,7 @@ from sklearn.metrics import mean_absolute_error, r2_score
 
 from ingestion.config import config
 
-OUT = Path("ml/output")
+OUT = Path(os.getenv("ML_OUTPUT_DIR", "ml/output"))
 FACT = "analytics_marts.fact_transactions"
 GEO = "analytics_marts.dim_geo"
 PRED_TABLE = "analytics_ml.predictions_prix_m2"

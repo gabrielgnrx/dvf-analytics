@@ -1,0 +1,15 @@
+# Profil dbt utilisé dans les conteneurs Airflow.
+# OAuth via les identifiants par défaut Google (ADC) montés dans le conteneur :
+# aucune clé de service account n'est stockée.
+dvf:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: "{{ env_var('GCP_PROJECT_ID') }}"
+      dataset: analytics
+      location: "{{ env_var('BQ_LOCATION', 'EU') }}"
+      threads: 4
+      priority: interactive
+      job_execution_timeout_seconds: 600

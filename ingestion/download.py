@@ -6,6 +6,7 @@ présent n'est pas retéléchargé.
 """
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import requests
@@ -13,7 +14,8 @@ from tqdm import tqdm
 
 from .config import config
 
-DATA_DIR = Path("data/raw")
+# Surchargeable par variable d'environnement (utile dans un conteneur Airflow).
+DATA_DIR = Path(os.getenv("DVF_DATA_DIR", "data/raw"))
 
 
 def download_file(url: str, dest: Path) -> bool:
