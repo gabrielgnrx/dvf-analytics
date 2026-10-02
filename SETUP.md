@@ -50,5 +50,13 @@ python -m exploration.profiling      # rapport de profilage de la donnée brute
 cd dbt/dvf && dbt deps && dbt build  # seeds + staging + intermediate + marts + tests
 ```
 
-Périmètre (`.env`) : `DVF_YEARS=2021,2022,2023,2024,2025` (geo-dvf « latest »
-couvre les 5 dernières années, 2025 partielle) et les 8 départements d'Île-de-France.
+Périmètre (`.env`) : `DVF_YEARS=auto` (les années publiées dans geo-dvf « latest »
+sont lues sur data.gouv à chaque exécution ; une liste explicite `2023,2024` reste
+possible) et les 8 départements d'Île-de-France.
+
+Mise à jour automatique : à chaque exécution, chaque fichier est comparé à sa
+version sur data.gouv (Last-Modified, taille, ETag mémorisés dans
+`data/raw/*.meta.json`). Seuls les fichiers republiés sont retéléchargés, puis la
+table brute est rechargée et dbt, le modèle et les tests sont rejoués. La
+dimension temps et le découpage train/validation/test suivent les années
+disponibles.

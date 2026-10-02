@@ -1,13 +1,22 @@
 -- Dimension temps au grain jour, générée (date spine) pour couvrir toute la
 -- période même les jours sans transaction.
+-- Bornes dynamiques : du 1er janvier de la première année de données au
+-- 31 décembre de la dernière (ou de l'année en cours). Surchargeables avec
+-- --vars '{date_debut: ..., date_fin: ...}'.
 
-with jours as (
+with bornes as (
+
+    select
+        {% if var("date_debut", none) %}date('{{ var("date_debut") }}'){% else %}date_trunc(min(date_mutation), year){% endif %} as debut,
+        {% if var("date_fin", none) %}date('{{ var("date_fin") }}'){% else %}last_day(greatest(max(date_mutation), current_date()), year){% endif %} as fin
+    from {{ ref('stg_dvf__mutations') }}
+
+),
+
+jours as (
 
     select jour
-    from unnest(generate_date_array(
-        date('{{ var("date_debut", "2021-01-01") }}'),
-        date('{{ var("date_fin", "2025-12-31") }}')
-    )) as jour
+    from bornes, unnest(generate_date_array(bornes.debut, bornes.fin)) as jour
 
 )
 

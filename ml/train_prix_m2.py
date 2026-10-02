@@ -3,8 +3,12 @@
 Méthodologie :
   - Cible : log(prix_m2). Le log stabilise la variance (Paris vs grande
     couronne) et rend l'erreur relative, plus parlante métier.
-  - Découpage TEMPOREL, pas aléatoire : entraînement 2021-2023, validation
-    2024 (réglage, early stopping), test 2025 (jamais vu). C'est la situation
+  - Découpage TEMPOREL, pas aléatoire, relatif aux données disponibles :
+    test = année la plus récente (jamais vue), validation = année précédente
+    (réglage, early stopping), entraînement = toutes les années antérieures.
+    Avec les millésimes 2021-2025 : entraînement 2021-2023, validation 2024,
+    test 2025. Quand data.gouv publie une nouvelle année, la fenêtre glisse
+    toute seule. C'est la situation
     réelle d'usage : prédire des ventes futures à partir du passé. Un split
     aléatoire surestimerait la performance (fuite d'information temporelle).
   - Référence (baseline) : prix médian au m² de la commune x type de bien
@@ -117,9 +121,12 @@ def run() -> None:
     df = load(client)
     print(f"{len(df):,} ventes exploitables")
 
-    train = df[df["annee"] <= 2023]
-    valid = df[df["annee"] == 2024]
-    test = df[df["annee"] >= 2025]
+    annee_test = int(df["annee"].max())
+    annee_valid = annee_test - 1
+    train = df[df["annee"] < annee_valid]
+    valid = df[df["annee"] == annee_valid]
+    test = df[df["annee"] == annee_test]
+    print(f"split : train <= {annee_valid - 1} | valid {annee_valid} | test {annee_test}")
     print(f"train {len(train):,} | valid {len(valid):,} | test {len(test):,}")
 
     feats = CAT + NUM
@@ -136,7 +143,7 @@ def run() -> None:
     print(f"meilleure itération : {model.best_iteration_}")
 
     results = {}
-    for name, part in [("validation 2024", valid), ("test 2025", test)]:
+    for name, part in [(f"validation {annee_valid}", valid), (f"test {annee_test}", test)]:
         if part.empty:
             continue
         pred = np.exp(model.predict(part[feats]))
