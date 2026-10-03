@@ -11,3 +11,11 @@ sources:
         columns:
           - name: id_mutation
             description: "Identifiant de la mutation (peut couvrir plusieurs lignes)."
+      - name: ref_gares
+        description: "Gares et stations en service en Île-de-France (IDFM, emplacement des gares). Une ligne par gare et par ligne desservie."
+      - name: ref_gares_projet
+        description: "Gares et stations en projet (IDFM), dont le Grand Paris Express."
+      - name: ref_revenus_communes
+        description: "Revenus disponibles par commune, INSEE Filosofi (via data.gouv)."
+      - name: ref_dpe_communes
+        description: "Nombre de diagnostics de performance énergétique par commune et étiquette (ADEME, logements existants)."

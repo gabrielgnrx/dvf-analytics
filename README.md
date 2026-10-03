@@ -5,6 +5,10 @@ géolocalisé), construite comme un projet portfolio data : chaîne complète de
 l'ingestion cloud à la restitution BI, avec une brique data science et une brique
 qualité de données.
 
+Enrichissement par données ouvertes : gares IDFM et futures gares du Grand Paris
+Express (distances calculées dans BigQuery), revenus INSEE, diagnostics énergétiques
+ADEME (voir `docs/enrichissement.md`).
+
 Périmètre initial : Île-de-France (départements 75, 77, 78, 91, 92, 93, 94, 95),
 2021 à 2025 (dernière année partielle). Scalable au national une fois la chaîne stabilisée.
 
@@ -35,6 +39,7 @@ Périmètre initial : Île-de-France (départements 75, 77, 78, 91, 92, 93, 94, 
 | Couche | Dossier | Compétence ciblée |
 |---|---|---|
 | Ingestion | `ingestion/` | Pipeline data, cloud warehouse |
+| Enrichissement | `ingestion/enrichment.py` + `stg_ref__*` | Croisement de sources ouvertes (IDFM, INSEE, ADEME), géospatial BigQuery |
 | Transformation | `dbt/dvf/models/` | Analytics engineering (dbt, schéma étoile) |
 | Qualité | tests dbt + `exploration/` | Gouvernance / data quality |
 | Data science | `ml/` | Modélisation, méthodo ML |
@@ -47,7 +52,7 @@ Périmètre initial : Île-de-France (départements 75, 77, 78, 91, 92, 93, 94, 
 2. `python -m venv .venv && source .venv/bin/activate`
 3. `pip install -r requirements.txt`
 4. Copier `.env.example` vers `.env` et le remplir.
-5. Ingestion : `python -m ingestion.load_to_bq`
+5. Ingestion : `python -m ingestion.load_to_bq` puis `python -m ingestion.enrichment`
 6. dbt : `cd dbt/dvf && dbt debug && dbt build`
 
 Détail dans `SETUP.md`.
@@ -60,6 +65,7 @@ Détail dans `SETUP.md`.
 - [x] Semaine 4 — BI : modèle sémantique Power BI (import, étoile, 21 mesures DAX, 3 rôles RLS), rapport 4 pages (`bi/DVF_Analytics.pbip`)
 - [x] Semaine 5 — Gouvernance : lignage, règles, tests, indicateurs qualité, RLS (`docs/gouvernance_qualite.md`)
 - [x] Orchestration : pipeline mensuel Airflow (Docker + Cosmos), voir `airflow/README.md`
+- [x] Enrichissement : gares et Grand Paris Express (IDFM), revenus (INSEE), DPE (ADEME), page Power BI « Transports et contexte local » (`docs/enrichissement.md`)
 - [ ] Semaine 6 — Finitions : démo vidéo, scale national (optionnel)
 
 ## Premiers résultats (Île-de-France, 2021 à 2025)
@@ -75,3 +81,7 @@ Détail dans `SETUP.md`.
   les Hauts-de-Seine, 3 136 € en Seine-et-Marne.
 - 42 contrôles dbt (tests de schéma, relations fait / dimensions, plages de valeurs) : 41 OK, 1 avertissement documenté.
 - Modèle LightGBM, test sur 2025 jamais vue : erreur médiane 13,0 % contre 16,3 % pour la baseline médiane commune x type (R² log 0,80).
+- Enrichissement : en petite couronne, un appartement à moins de 500 m d'une gare
+  se vend environ 80 % plus cher au m² qu'à plus de 2 km ; pas de prime
+  « Grand Paris Express » visible entre 2021 et 2025 ; le modèle enrichi passe à
+  12,8 % d'erreur médiane (voir `docs/enrichissement.md`).

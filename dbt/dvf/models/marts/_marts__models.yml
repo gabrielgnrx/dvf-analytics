@@ -51,6 +51,20 @@ models:
         description: "Vrai si le prix au m² existe et se situe entre 1 000 et 30 000 euros."
       - name: type_bien
         description: "Appartement, Maison, Multi-logements, Local commercial, Dépendance seule, Terrain / non bâti."
+      - name: dist_gare_m
+        description: "Distance à la gare lourde la plus proche (métro, RER, train, VAL), en mètres, plafonnée à 5 km."
+      - name: tranche_dist_gare
+        description: "Tranche de distance à la gare la plus proche."
+        tests:
+          - accepted_values:
+              values: ['1. Moins de 500 m', '2. 500 m à 1 km', '3. 1 à 2 km', '4. Plus de 2 km']
+      - name: dist_gpe_m
+        description: "Distance à la future gare du Grand Paris Express la plus proche, en mètres, plafonnée à 10 km."
+      - name: tranche_dist_gpe
+        description: "Tranche de distance à la future gare du Grand Paris Express."
+        tests:
+          - accepted_values:
+              values: ['1. Moins de 800 m', '2. 800 m à 1,5 km', '3. 1,5 à 3 km', '4. Plus de 3 km']
 
   - name: dim_geo
     description: "Dimension commune (arrondissement pour Paris), avec département et zone."
@@ -59,6 +73,14 @@ models:
         tests: [unique, not_null]
       - name: zone
         tests: [not_null]
+      - name: revenu_median_uc
+        description: "Revenu disponible médian par unité de consommation (€/an, INSEE Filosofi). Nul si secret statistique."
+        tests:
+          - dbt_utils.accepted_range: {min_value: 5000, max_value: 100000}
+      - name: part_dpe_fg_pct
+        description: "Part des logements diagnostiqués classés F ou G (passoires thermiques), en %."
+        tests:
+          - dbt_utils.accepted_range: {min_value: 0, max_value: 100}
 
   - name: dim_temps
     description: "Dimension calendrier au jour."
@@ -77,3 +99,17 @@ models:
     columns:
       - name: transaction_id
         tests: [unique, not_null]
+
+  - name: mart_proximite_gpe
+    description: >
+      Prix au m² médian par année, zone, type de bien et distance à la future
+      gare du Grand Paris Express (hors Paris), avec l'évolution depuis la
+      première année disponible.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [annee, zone, type_bien, tranche_dist_gpe]
+    columns:
+      - name: prix_m2_median
+        tests:
+          - not_null
+          - dbt_utils.accepted_range: {min_value: 500, max_value: 30000}

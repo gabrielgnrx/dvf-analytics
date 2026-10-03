@@ -5,6 +5,8 @@ Ordre d'exécution (une fois par mois) :
     téléchargement geo-dvf
         -> chargement brut BigQuery (raw.dvf_mutations)
         -> contrôle qualité de l'atterrissage (bloquant)
+    sources d'enrichissement (gares IDFM, Grand Paris Express, revenus INSEE,
+    DPE ADEME) chargées en parallèle dans raw.ref_*
         -> dbt : seeds, staging, intermediate, étoile, avec les tests
            exécutés après chaque modèle (Cosmos : une tâche Airflow par modèle)
         -> entraînement du modèle de prix au m² et écriture des prédictions
@@ -90,6 +92,14 @@ def dvf_pipeline():
 
         load()
 
+    @task(execution_timeout=timedelta(minutes=20))
+    def load_enrichment() -> dict:
+        """Recharge les sources d'enrichissement (petits volumes, rechargement complet)."""
+        _in_project_dir()
+        from ingestion.enrichment import load_all
+
+        return load_all()
+
     @task
     def check_raw_landing() -> dict:
         """Contrôle bloquant : volume minimal et couverture des départements."""
@@ -118,6 +128,10 @@ def dvf_pipeline():
         render_config=RenderConfig(
             exclude=["mart_ecarts_prix"],
             test_behavior=TestBehavior.AFTER_EACH,
+            # Les tests qui portent sur plusieurs modèles (ex. couverture de
+            # l'enrichissement) deviennent des tâches à part, lancées quand
+            # tous leurs modèles sont construits.
+            should_detach_multiple_parents_tests=True,
         ),
         operator_args=DBT_ARGS,
     )
@@ -179,7 +193,10 @@ def dvf_pipeline():
     landing = check_raw_landing()
     model = train_price_model()
 
+    enrichment = load_enrichment()
+
     loaded >> landing >> dbt_transform >> model >> dbt_ml_mart
+    enrichment >> dbt_transform
     dbt_ml_mart >> log_run(landing)
 
 

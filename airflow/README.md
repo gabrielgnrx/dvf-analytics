@@ -4,8 +4,8 @@ Le pipeline complet tourne dans Airflow (Docker, LocalExecutor), une fois par
 mois, le 1er à 6 h.
 
 ```
-download_geo_dvf → load_raw_bigquery → check_raw_landing
-    → dbt_transform (une tâche par modèle dbt, tests après chaque modèle)
+download_geo_dvf → load_raw_bigquery → check_raw_landing ┐
+load_enrichment (gares, GPE, revenus, DPE) ──────────────┴→ dbt_transform (une tâche par modèle dbt, tests après chaque modèle)
     → train_price_model → dbt_ml_mart → log_run
 ```
 
@@ -14,6 +14,7 @@ download_geo_dvf → load_raw_bigquery → check_raw_landing
 | `download_geo_dvf` | Télécharge les CSV geo-dvf du périmètre (cache local, idempotent) |
 | `load_raw_bigquery` | Recharge `raw.dvf_mutations` |
 | `check_raw_landing` | Contrôle bloquant : au moins 1 M lignes et les 8 départements présents |
+| `load_enrichment` | Recharge `raw.ref_*` : gares IDFM, Grand Paris Express, revenus INSEE, DPE ADEME |
 | `dbt_transform` | Seeds, staging, intermediate, étoile ; chaque modèle suivi de ses tests (Astronomer Cosmos) |
 | `train_price_model` | Réentraîne LightGBM et réécrit `analytics_ml.predictions_prix_m2` |
 | `dbt_ml_mart` | Reconstruit `mart_ecarts_prix` et ses tests |

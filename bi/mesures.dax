@@ -54,3 +54,30 @@ MEDIAN ( mart_ecarts_prix[ecart_pct] ) / 100
 
 Rang commune prix m² =
 RANKX ( ALLSELECTED ( dim_geo[nom_commune] ), [Prix m² médian], , DESC, DENSE )
+
+-- Transports et contexte local (sources d'enrichissement)
+
+Distance médiane gare (m) =
+CALCULATE ( MEDIAN ( fact_transactions[dist_gare_m] ), fact_transactions[est_vente_simple] = TRUE () )
+
+Part ventes à moins de 500 m de la gare =
+DIVIDE (
+    CALCULATE ( [Nb ventes], fact_transactions[est_vente_simple] = TRUE (), fact_transactions[dist_gare_m] < 500 ),
+    CALCULATE ( [Nb ventes], fact_transactions[est_vente_simple] = TRUE (), NOT ISBLANK ( fact_transactions[dist_gare_m] ) )
+)
+
+Revenu médian communal =
+AVERAGE ( dim_geo[revenu_median_uc] )
+
+-- Moyenne des parts communales pondérée par le nombre de DPE
+Part passoires DPE =
+DIVIDE ( SUMX ( dim_geo, dim_geo[nb_dpe] * dim_geo[part_dpe_fg_pct] / 100 ), SUM ( dim_geo[nb_dpe] ) )
+
+-- Évolution par rapport à la première année de données, hors Paris (les
+-- futures gares du Grand Paris Express sont en petite et grande couronne)
+Évolution prix m² depuis la 1re année (hors Paris) =
+VAR an0 = YEAR ( CALCULATE ( MIN ( fact_transactions[date_mutation] ), REMOVEFILTERS ( dim_temps ) ) )
+VAR base = CALCULATE ( [Prix m² médian], REMOVEFILTERS ( dim_temps ), dim_temps[annee] = an0, KEEPFILTERS ( dim_geo[zone] <> "Paris" ) )
+VAR cur = CALCULATE ( [Prix m² médian], KEEPFILTERS ( dim_geo[zone] <> "Paris" ) )
+RETURN DIVIDE ( cur - base, base )
+

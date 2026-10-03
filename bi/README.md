@@ -49,5 +49,10 @@ Scénario : un directeur d'agence ne voit que son périmètre. Tester avec
    surfaces, top / flop communes (Rang commune prix m²), segments T1 à T5+.
 3. **Modèle et écarts** : répartition par positionnement_prix, nuage prix réel
    vs prix prédit, communes où le marché est le plus dispersé.
-4. **Qualité des données** : Part ventes fiables %, volumes par type de bien,
+4. **Transports et contexte local** : distance médiane à une gare, part des
+   ventes à moins de 500 m, revenu médian communal, part de passoires
+   thermiques ; prix au m² par distance à la gare et par zone ; évolution du
+   prix selon la distance à une future gare du Grand Paris Express (hors
+   Paris) ; nuages revenu / prix et DPE / prix par commune.
+5. **Qualité des données** : Part ventes fiables %, volumes par type de bien,
    lien vers le rapport de profilage.

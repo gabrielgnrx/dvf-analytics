@@ -10,14 +10,27 @@ with m as (
 
 ),
 
+transports as (
+
+    select * from {{ ref('int_geo__proximite_transports') }}
+
+),
+
 enrichi as (
 
     select
         m.*,
         {{ classe_pieces('nb_pieces', 'type_bien') }}   as classe_pieces,
         {{ tranche_surface('surface_habitable') }}     as tranche_surface,
-        if(est_vente_simple, round(valeur_fonciere / surface_habitable, 2), null) as prix_m2
+        if(est_vente_simple, round(valeur_fonciere / surface_habitable, 2), null) as prix_m2,
+        t.dist_gare_m,
+        t.gare_proche,
+        t.mode_gare_proche,
+        t.nb_gares_1km,
+        t.dist_gpe_m,
+        t.gare_gpe_proche
     from m
+    left join transports t using (id_mutation)
 
 )
 
@@ -49,5 +62,26 @@ select
     (prix_m2 is not null and prix_m2 between 1000 and 30000) as est_prix_m2_fiable,
     latitude,
     longitude,
+    -- Accessibilité (null si la vente n'est pas géolocalisée)
+    dist_gare_m,
+    gare_proche,
+    mode_gare_proche,
+    nb_gares_1km,
+    case
+        when dist_gare_m is null then null
+        when dist_gare_m < 500 then '1. Moins de 500 m'
+        when dist_gare_m < 1000 then '2. 500 m à 1 km'
+        when dist_gare_m < 2000 then '3. 1 à 2 km'
+        else '4. Plus de 2 km'
+    end                                                     as tranche_dist_gare,
+    dist_gpe_m,
+    gare_gpe_proche,
+    case
+        when dist_gpe_m is null then null
+        when dist_gpe_m < 800 then '1. Moins de 800 m'
+        when dist_gpe_m < 1500 then '2. 800 m à 1,5 km'
+        when dist_gpe_m < 3000 then '3. 1,5 à 3 km'
+        else '4. Plus de 3 km'
+    end                                                     as tranche_dist_gpe,
     nb_lignes_source
 from enrichi

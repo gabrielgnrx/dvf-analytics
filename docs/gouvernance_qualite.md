@@ -38,6 +38,13 @@ Familles de tests : `not_null`, `unique`, `accepted_values`,
 `dbt_utils.accepted_range`, `relationships` (chaque clé du fait existe dans sa
 dimension).
 
+Sources d'enrichissement (depuis le 3 octobre 2026) : unicité des ventes dans
+`int_geo__proximite_transports`, plages de distances (0 à 5 km, 0 à 10 km),
+plages de revenus et de parts DPE, valeurs autorisées des tranches de
+distance, unicité du grain de `mart_proximite_gpe`, et un test singulier de
+couverture (`tests/assert_couverture_enrichissement.sql`) : le build échoue si
+moins de 95 % des ventes sont enrichies par l'une des sources.
+
 ## 4. Indicateurs de qualité (Île-de-France, 2021 à 2025)
 
 | Indicateur | Valeur |

@@ -1,4 +1,4 @@
-# Modèle prix au m² — résultats (run du 1er octobre 2026)
+# Modèle prix au m² — résultats (run du 3 octobre 2026)
 
 Ventes exploitables (vente simple d'un logement, prix au m² fiable) : 675 769.
 Découpage temporel : entraînement 2021-2023 (442 186), validation 2024
@@ -15,6 +15,19 @@ Découpage temporel : entraînement 2021-2023 (442 186), validation 2024
 
 Sur l'année 2025, jamais vue à l'entraînement, le modèle réduit l'erreur
 médiane de 16,3 % à 13,0 % par rapport à la règle métier simple.
+
+### Avec les variables d'enrichissement (gares, Grand Paris Express, revenus, DPE)
+
+| Jeu | Modèle | MAE (€/m²) | MdAPE | Part à ±10 % | R² (log) |
+|---|---|---:|---:|---:|---:|
+| Validation 2024 | LightGBM enrichi | 1 027 | 12,9 % | 40,2 % | 0,792 |
+| Validation 2024 | LightGBM sans enrichissement | 1 035 | 13,1 % | 39,4 % | 0,788 |
+| Test 2025 | LightGBM enrichi | 1 015 | 12,8 % | 40,4 % | 0,804 |
+| Test 2025 | LightGBM sans enrichissement | 1 023 | 13,0 % | 39,7 % | 0,801 |
+
+Gain modeste (13,0 % à 12,8 % d'erreur médiane) : les variables communales
+sont redondantes avec le code commune, le gain vient des distances aux gares,
+mesurées au niveau du logement. Détail dans `docs/enrichissement.md`.
 
 ## Erreur par segment (test 2025)
 
@@ -48,4 +61,6 @@ type de bien 1,3 %, pièces 0,6 %, tendance temporelle 0,4 %.
 - L'erreur est la plus forte à Paris et en Seine-Saint-Denis, deux marchés
   très hétérogènes à l'intérieur d'une même commune ou d'un même arrondissement.
 - Pistes d'amélioration : variables de voisinage (prix médian glissant à
-  500 m, IRIS), distance aux gares, données DPE de l'ADEME.
+  500 m, IRIS), DPE rapproché au niveau du logement (adresse) plutôt que de
+  la commune. Les distances aux gares et les indicateurs communaux (revenus,
+  DPE) sont intégrés depuis le 3 octobre 2026.

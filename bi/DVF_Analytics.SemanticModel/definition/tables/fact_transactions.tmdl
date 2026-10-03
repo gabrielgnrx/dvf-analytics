@@ -106,6 +106,31 @@ table fact_transactions
 		displayFolder: Prix
 		lineageTag: cbf45340-79af-4134-813d-3344f02c7858
 
+	measure 'Distance médiane gare (m)' = CALCULATE ( MEDIAN ( fact_transactions[dist_gare_m] ), fact_transactions[est_vente_simple] = TRUE () )
+		formatString: #,0
+		displayFolder: Transports et contexte
+		lineageTag: a7239679-bb08-460d-b71a-787bd792f5af
+
+	measure 'Part ventes à moins de 500 m de la gare' = DIVIDE ( CALCULATE ( [Nb ventes], fact_transactions[est_vente_simple] = TRUE (), fact_transactions[dist_gare_m] < 500 ), CALCULATE ( [Nb ventes], fact_transactions[est_vente_simple] = TRUE (), NOT ISBLANK ( fact_transactions[dist_gare_m] ) ) )
+		formatString: 0.0 %
+		displayFolder: Transports et contexte
+		lineageTag: f59e7590-587b-4d91-9050-cd08a67375cc
+
+	measure 'Revenu médian communal' = AVERAGE ( dim_geo[revenu_median_uc] )
+		formatString: #,0 €
+		displayFolder: Transports et contexte
+		lineageTag: 398ab76a-fe93-465c-af72-471112a1995f
+
+	measure 'Part passoires DPE' = DIVIDE ( SUMX ( dim_geo, dim_geo[nb_dpe] * dim_geo[part_dpe_fg_pct] / 100 ), SUM ( dim_geo[nb_dpe] ) )
+		formatString: 0.0 %
+		displayFolder: Transports et contexte
+		lineageTag: 788128cb-5d38-4cfc-99fd-67edbfdf41b4
+
+	measure 'Évolution prix m² depuis la 1re année (hors Paris)' = VAR an0 = YEAR ( CALCULATE ( MIN ( fact_transactions[date_mutation] ), REMOVEFILTERS ( dim_temps ) ) ) VAR base = CALCULATE ( [Prix m² médian], REMOVEFILTERS ( dim_temps ), dim_temps[annee] = an0, KEEPFILTERS ( dim_geo[zone] <> "Paris" ) ) VAR cur = CALCULATE ( [Prix m² médian], KEEPFILTERS ( dim_geo[zone] <> "Paris" ) ) RETURN IF ( NOT ISBLANK ( cur ), DIVIDE ( cur - base, base ) )
+		formatString: 0.0 %
+		displayFolder: Transports et contexte
+		lineageTag: 8ad814e5-7bb8-4f78-971e-b0a4a1f0f101
+
 	column transaction_id
 		dataType: string
 		isHidden
@@ -341,6 +366,81 @@ table fact_transactions
 		lineageTag: f50bf78b-22a5-47c4-b9bd-b3ccda9ba207
 		summarizeBy: sum
 		sourceColumn: nb_lignes_source
+
+		annotation SummarizationSetBy = Automatic
+
+	column dist_gare_m
+		dataType: double
+		formatString: #,0
+		sourceProviderType: double
+		lineageTag: 37048e8f-3e6c-48d1-97fc-b44c52bcb365
+		summarizeBy: none
+		sourceColumn: dist_gare_m
+
+		annotation SummarizationSetBy = Automatic
+
+	column gare_proche
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: acb25733-f665-4387-84df-03706d0f93fa
+		summarizeBy: none
+		sourceColumn: gare_proche
+
+		annotation SummarizationSetBy = Automatic
+
+	column mode_gare_proche
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: a112e2d5-2a1b-4e1b-ae4a-cdc44224679b
+		summarizeBy: none
+		sourceColumn: mode_gare_proche
+
+		annotation SummarizationSetBy = Automatic
+
+	column nb_gares_1km
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 5e4672d4-c21b-4528-b411-7cfc569c2645
+		summarizeBy: none
+		sourceColumn: nb_gares_1km
+
+		annotation SummarizationSetBy = Automatic
+
+	column tranche_dist_gare
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: 454536a4-0b38-43f3-9784-00cf36571d35
+		summarizeBy: none
+		sourceColumn: tranche_dist_gare
+
+		annotation SummarizationSetBy = Automatic
+
+	column dist_gpe_m
+		dataType: double
+		formatString: #,0
+		sourceProviderType: double
+		lineageTag: a5c01c7e-2202-4004-b95c-ced6515aa806
+		summarizeBy: none
+		sourceColumn: dist_gpe_m
+
+		annotation SummarizationSetBy = Automatic
+
+	column gare_gpe_proche
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: 8902e948-c2f7-402e-b884-f2d3d946554f
+		summarizeBy: none
+		sourceColumn: gare_gpe_proche
+
+		annotation SummarizationSetBy = Automatic
+
+	column tranche_dist_gpe
+		dataType: string
+		sourceProviderType: nvarchar(16384)
+		lineageTag: 80160ec0-558f-4348-be48-0471c0beba21
+		summarizeBy: none
+		sourceColumn: tranche_dist_gpe
 
 		annotation SummarizationSetBy = Automatic
 

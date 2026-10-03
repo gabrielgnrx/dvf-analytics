@@ -214,6 +214,48 @@ cultureInfo fr-FR
 			          }
 			        }
 			      ]
+			    },
+			    "fact_transactions.tranche_dist_gare": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "fact_transactions",
+			          "ConceptualProperty": "tranche_dist_gare"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Distance à la gare": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "fact_transactions.tranche_dist_gpe": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "fact_transactions",
+			          "ConceptualProperty": "tranche_dist_gpe"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Distance future gare GPE": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
 			    }
 			  }
 			}

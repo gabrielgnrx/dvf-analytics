@@ -100,6 +100,96 @@ table dim_geo
 
 		annotation SummarizationSetBy = Automatic
 
+	column revenu_median_uc
+		dataType: double
+		formatString: #,0
+		sourceProviderType: double
+		lineageTag: 4d67639c-c84d-4133-9067-20f3faee312f
+		summarizeBy: none
+		sourceColumn: revenu_median_uc
+
+		annotation SummarizationSetBy = Automatic
+
+	column revenu_d1_uc
+		dataType: double
+		formatString: #,0
+		sourceProviderType: double
+		lineageTag: 9d5a2901-330d-4df6-8280-02a44423d3b1
+		summarizeBy: none
+		sourceColumn: revenu_d1_uc
+
+		annotation SummarizationSetBy = Automatic
+
+	column revenu_d9_uc
+		dataType: double
+		formatString: #,0
+		sourceProviderType: double
+		lineageTag: eaccbe45-af88-43e1-bbab-ea622555307c
+		summarizeBy: none
+		sourceColumn: revenu_d9_uc
+
+		annotation SummarizationSetBy = Automatic
+
+	column rapport_d9_d1
+		dataType: double
+		formatString: 0.00
+		sourceProviderType: double
+		lineageTag: 6f8bd0d6-3ef3-4edc-97b0-61ef4724febd
+		summarizeBy: none
+		sourceColumn: rapport_d9_d1
+
+		annotation SummarizationSetBy = Automatic
+
+	column nb_menages_fiscaux
+		dataType: int64
+		formatString: #,0
+		sourceProviderType: bigint
+		lineageTag: 5e4d8b7b-fb45-4611-b76a-750f2444e44d
+		summarizeBy: none
+		sourceColumn: nb_menages_fiscaux
+
+		annotation SummarizationSetBy = Automatic
+
+	column millesime_revenus
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: bb4dccea-ac61-4b32-ac16-45500c48cd6e
+		summarizeBy: none
+		sourceColumn: millesime_revenus
+
+		annotation SummarizationSetBy = Automatic
+
+	column nb_dpe
+		dataType: int64
+		formatString: #,0
+		sourceProviderType: bigint
+		lineageTag: 9f20dc96-c040-4b24-9678-b9ea0596f2cb
+		summarizeBy: none
+		sourceColumn: nb_dpe
+
+		annotation SummarizationSetBy = Automatic
+
+	column part_dpe_fg_pct
+		dataType: double
+		formatString: 0.0
+		sourceProviderType: double
+		lineageTag: 08a5da3f-67e3-45ad-890f-c670086bfaba
+		summarizeBy: none
+		sourceColumn: part_dpe_fg_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column part_dpe_ab_pct
+		dataType: double
+		formatString: 0.0
+		sourceProviderType: double
+		lineageTag: 7947d00a-f661-4dce-bc67-381a08aff1ca
+		summarizeBy: none
+		sourceColumn: part_dpe_ab_pct
+
+		annotation SummarizationSetBy = Automatic
+
 	partition dim_geo = m
 		mode: import
 		source =

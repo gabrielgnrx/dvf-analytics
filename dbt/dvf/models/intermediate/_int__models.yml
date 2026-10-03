@@ -15,3 +15,27 @@ models:
         tests:
           - accepted_values:
               values: ['Appartement', 'Maison', 'Multi-logements', 'Local commercial', 'Dépendance seule', 'Terrain / non bâti']
+
+  - name: int_geo__proximite_transports
+    description: >
+      Accessibilité en transports de chaque vente géolocalisée : gare lourde
+      la plus proche (métro, RER, train, VAL), nombre de gares à moins de 1 km
+      et distance à la future gare du Grand Paris Express la plus proche.
+      Distances plafonnées à 5 km (gares) et 10 km (Grand Paris Express).
+    columns:
+      - name: id_mutation
+        tests: [unique, not_null]
+      - name: dist_gare_m
+        description: "Distance à vol d'oiseau à la gare lourde la plus proche, en mètres (plafond 5 000)."
+        tests:
+          - not_null
+          - dbt_utils.accepted_range: {min_value: 0, max_value: 5000}
+      - name: nb_gares_1km
+        description: "Nombre de gares lourdes distinctes à moins de 1 km."
+        tests: [not_null]
+      - name: dist_gpe_m
+        description: "Distance à la future gare du Grand Paris Express la plus proche, en mètres (plafond 10 000)."
+        tests:
+          - not_null
+          - dbt_utils.accepted_range: {min_value: 0, max_value: 10000}
+
