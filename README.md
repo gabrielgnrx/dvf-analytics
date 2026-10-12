@@ -66,7 +66,6 @@ Détail dans `SETUP.md`.
 - [x] Semaine 5 — Gouvernance : lignage, règles, tests, indicateurs qualité, RLS (`docs/gouvernance_qualite.md`)
 - [x] Orchestration : pipeline mensuel Airflow (Docker + Cosmos), voir `airflow/README.md`
 - [x] Enrichissement : gares et Grand Paris Express (IDFM), revenus (INSEE), DPE (ADEME), page Power BI « Transports et contexte local » (`docs/enrichissement.md`)
-- [ ] Semaine 6 — Finitions : démo vidéo, scale national (optionnel)
 
 ## Premiers résultats (Île-de-France, 2021 à 2025)
 
