@@ -58,7 +58,11 @@ Couverture observée sur les ventes simples : 100 % pour les revenus et le DPE,
 
 En petite couronne, un appartement à moins de 500 m d'une gare se vend environ
 80 % plus cher au m² qu'un appartement à plus de 2 km. L'écart mêle l'effet de
-la gare et celui des communes les mieux desservies (proches de Paris). En
+la gare et celui des communes les mieux desservies (proches de Paris). Pour
+isoler l'effet propre de la gare, `ml/effet_gare.py` compare des ventes de la
+même commune (régression hédonique à effet fixe commune, à surface, pièces,
+type de bien et année égaux, erreurs groupées par commune) ; résultats dans
+`ml/output/effet_gare.md`. En
 grande couronne, l'effet est faible et non monotone : la tranche « plus de
 2 km » contient des communes résidentielles recherchées.
 
@@ -113,4 +117,6 @@ l'adresse, étage) ou du quartier (IRIS).
 - Revenus : un seul millésime (2021), appliqué à toutes les années.
 - DPE : stock de diagnostics réalisés depuis juillet 2021, pas l'ensemble du
   parc ; les logements diagnostiqués sont surtout ceux vendus ou loués.
-- Les constats sont des corrélations, pas des effets causaux.
+- Les constats descriptifs sont des corrélations. La régression à effet fixe
+  commune retire les différences entre communes, pas celles entre quartiers
+  d'une même commune.
