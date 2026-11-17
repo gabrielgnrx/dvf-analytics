@@ -18,7 +18,7 @@ dbt/dvf/logs/
 .user.yml
 
 # Données locales
-data/
+/data/
 *.csv
 *.csv.gz
 *.parquet
