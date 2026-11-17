@@ -76,3 +76,14 @@ modèle évalué). Auparavant, le modèle final était entraîné sur toutes les
 ventes puis appliqué à ces mêmes ventes : il en avait appris une partie, ce
 qui tassait les écarts et sous-estimait les ventes atypiques. Les métriques
 de ces prédictions figurent à la fin de `ml/output/rapport_modele.md`.
+
+Run du 17 novembre 2026 (675 769 ventes, chaque année prédite par un modèle
+entraîné sur les autres) :
+
+| Prédictions | MAE (€/m²) | MdAPE | Part à ±10 % | R² (log) |
+|---|---:|---:|---:|---:|
+| Hors échantillon, toutes années | 1 004 | 12,2 % | 42,1 % | 0,81 |
+
+Ces chiffres sont proches de ceux du test 2025 (12,8 %) : les écarts affichés
+dans le rapport Power BI reflètent bien l'erreur d'un modèle sur des ventes
+qu'il n'a pas vues.
