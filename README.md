@@ -96,7 +96,7 @@ Prochaines étapes : vidéo de démonstration, passage au national, variables de
 voisinage (prix des ventes antérieures à moins de 500 m), intervalles de
 prédiction.
 
-## Premiers résultats (run du 3 octobre 2026, publication DVF d'avril 2026, 2021 à 2025)
+## Premiers résultats (run du 17 novembre 2026, geo-dvf 2021 à 2025)
 
 - 2,43 M lignes brutes chargées, agrégées en environ 885 000 mutations (ventes).
 - Une mutation DVF est éclatée sur plusieurs lignes et la valeur foncière y est
@@ -107,12 +107,14 @@ prédiction.
   suppression silencieuse des valeurs aberrantes.
 - Contrôle de cohérence : prix médian au m² de 10 325 € à Paris, 6 900 € dans
   les Hauts-de-Seine, 3 136 € en Seine-et-Marne.
-- 42 contrôles dbt (tests de schéma, relations fait / dimensions, plages de valeurs) : 41 OK, 1 avertissement documenté.
+- `dbt build` : 66 nœuds (modèles, seed, tests de schéma, relations fait / dimensions, plages de valeurs, couverture de l'enrichissement), 0 erreur, 1 avertissement documenté.
 - Modèle LightGBM, test sur 2025 jamais vue : erreur médiane 13,0 % contre 16,3 % pour la baseline médiane commune x type (R² log 0,80).
+- Écarts au marché calculés hors échantillon (chaque vente prédite par un modèle qui ne l'a pas vue) : erreur médiane 12,2 %, 42 % des ventes à ±10 % du prix attendu.
 - Enrichissement : en petite couronne, un appartement à moins de 500 m d'une gare
-  se vend environ 80 % plus cher au m² qu'à plus de 2 km, écart qui mêle l'effet
-  de la gare et celui de la commune (voir `ml/effet_gare.py` pour l'effet à
-  commune égale) ; pas de prime « Grand Paris Express » visible entre 2021 et
+  se vend environ 80 % plus cher au m² qu'à plus de 2 km ; à commune égale
+  (régression à effet fixe, `ml/effet_gare.py`), la prime tombe à environ 23 %
+  (intervalle de confiance à 95 % : 7 à 41 %), le reste de l'écart venant de la
+  localisation des communes ; pas de prime « Grand Paris Express » visible entre 2021 et
   2025 ; le modèle enrichi passe à 12,8 % d'erreur médiane (voir `docs/enrichissement.md`).
 
 ## Licence
