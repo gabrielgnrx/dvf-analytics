@@ -22,7 +22,11 @@ Méthodologie :
     inégalités de la commune (INSEE), part de passoires thermiques (ADEME).
     Le modèle est aussi entraîné sans elles pour mesurer leur apport.
   - Analyse d'erreur par département et par type de bien, importance des
-    variables, puis réinjection des prédictions dans BigQuery pour le BI.
+    variables.
+  - Écarts au marché pour le BI : chaque vente est prédite par un modèle
+    entraîné sans son année (une année exclue à la fois). Les écarts sont donc
+    calculés hors échantillon : un modèle qui prédirait ses propres données
+    d'entraînement donnerait des écarts artificiellement tassés.
 
 Usage : python -m ml.train_prix_m2
 """
@@ -35,9 +39,15 @@ import lightgbm as lgb
 import numpy as np
 import pandas as pd
 from google.cloud import bigquery
-from sklearn.metrics import mean_absolute_error, r2_score
 
 from ingestion.config import config
+from ml.evaluation import (
+    baseline,
+    ecart_pct,
+    metrics,
+    predictions_hors_echantillon,
+    segment_errors,
+)
 
 OUT = Path(os.getenv("ML_OUTPUT_DIR", "ml/output"))
 FACT = "analytics_marts.fact_transactions"
@@ -83,11 +93,11 @@ ENRICH = [
     "dist_gare_m", "nb_gares_1km", "dist_gpe_m",
     "revenu_median_uc", "rapport_d9_d1", "part_dpe_fg_pct",
 ]
-PARAMS = dict(
-    n_estimators=3000, learning_rate=0.05, num_leaves=127,
-    min_child_samples=40, subsample=0.8, subsample_freq=1,
-    colsample_bytree=0.8, reg_lambda=1.0, verbose=-1,
-)
+PARAMS = {
+    "n_estimators": 3000, "learning_rate": 0.05, "num_leaves": 127,
+    "min_child_samples": 40, "subsample": 0.8, "subsample_freq": 1,
+    "colsample_bytree": 0.8, "reg_lambda": 1.0, "verbose": -1,
+}
 
 
 def load(client: bigquery.Client) -> pd.DataFrame:
@@ -102,39 +112,6 @@ def load(client: bigquery.Client) -> pd.DataFrame:
         df[c] = df[c].astype("category")
     df["y"] = np.log(df["prix_m2"])
     return df
-
-
-def metrics(y_true_m2: np.ndarray, y_pred_m2: np.ndarray) -> dict[str, float]:
-    ape = np.abs(y_pred_m2 - y_true_m2) / y_true_m2
-    return {
-        "MAE (€/m²)": round(mean_absolute_error(y_true_m2, y_pred_m2), 0),
-        "MdAPE (%)": round(float(np.median(ape)) * 100, 1),
-        "Part à ±10 % (%)": round(float(np.mean(ape <= 0.10)) * 100, 1),
-        "R² (log)": round(r2_score(np.log(y_true_m2), np.log(y_pred_m2)), 3),
-    }
-
-
-def baseline(train: pd.DataFrame, other: pd.DataFrame) -> np.ndarray:
-    """Médiane commune x type sur l'entraînement, repli sur le département."""
-    by_ct = train.groupby(["code_commune", "type_bien"], observed=True)["prix_m2"].median()
-    by_d = train.groupby(["code_departement", "type_bien"], observed=True)["prix_m2"].median()
-    keys_ct = list(zip(other["code_commune"], other["type_bien"]))
-    keys_d = list(zip(other["code_departement"], other["type_bien"]))
-    pred = pd.Series(keys_ct).map(by_ct.to_dict())
-    fallback = pd.Series(keys_d).map(by_d.to_dict())
-    return pred.fillna(fallback).fillna(train["prix_m2"].median()).to_numpy()
-
-
-def segment_errors(df: pd.DataFrame, pred_col: str, by: str) -> pd.DataFrame:
-    ape = (df[pred_col] - df["prix_m2"]).abs() / df["prix_m2"]
-    return (
-        df.assign(ape=ape)
-        .groupby(by, observed=True)
-        .agg(n=("ape", "size"), prix_m2_median=("prix_m2", "median"),
-             MdAPE_pct=("ape", lambda s: round(s.median() * 100, 1)))
-        .sort_values("MdAPE_pct", ascending=False)
-        .reset_index()
-    )
 
 
 def fit(train: pd.DataFrame, valid: pd.DataFrame, feats: list[str]) -> lgb.LGBMRegressor:
@@ -192,13 +169,18 @@ def run() -> None:
         .sort_values("part_pct", ascending=False)[["variable", "part_pct"]]
     )
 
-    # Réentraînement sur tout l'historique au nombre d'itérations retenu,
-    # puis prédiction de toutes les ventes pour le BI (écart prix réel / modèle).
-    final = lgb.LGBMRegressor(**{**model.get_params(), "n_estimators": model.best_iteration_})
-    final.fit(df[feats], df["y"])
-    df["prix_m2_predit"] = np.exp(final.predict(df[feats])).round(0)
-    out = df[["transaction_id", "prix_m2_predit"]].copy()
-    out["ecart_pct"] = ((df["prix_m2"] - df["prix_m2_predit"]) / df["prix_m2_predit"] * 100).round(1)
+    # Écarts au marché pour le BI : prédictions hors échantillon (une année
+    # exclue à la fois), au nombre d'itérations retenu par l'early stopping.
+    params_finaux = {**model.get_params(), "n_estimators": model.best_iteration_}
+
+    def fit_annee(X: pd.DataFrame, y: pd.Series) -> lgb.LGBMRegressor:
+        return lgb.LGBMRegressor(**params_finaux).fit(X, y)
+
+    df["prix_m2_predit"] = predictions_hors_echantillon(df, feats, fit_annee).round(0)
+    df["ecart_pct"] = ecart_pct(df["prix_m2"].to_numpy(), df["prix_m2_predit"].to_numpy())
+    oof = metrics(df["prix_m2"].to_numpy(), df["prix_m2_predit"].to_numpy())
+    print(f"prédictions hors échantillon : {oof}")
+    out = df[["transaction_id", "prix_m2_predit", "ecart_pct"]].copy()
 
     ds = bigquery.Dataset(f"{config.project_id}.analytics_ml")
     ds.location = config.location
@@ -212,8 +194,10 @@ def run() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     report = [
         "# Modèle prix au m² — rapport d'évaluation\n",
-        f"Ventes exploitables : {len(df):,} (train {len(train):,}, "
-        f"validation {len(valid):,}, test {len(test):,}).\n",
+        (
+            f"Ventes exploitables : {len(df):,} (train {len(train):,}, "
+            f"validation {len(valid):,}, test {len(test):,}).\n"
+        ),
         "## Performance (modèle enrichi, modèle sans enrichissement, baseline médiane commune x type)\n",
         res.to_markdown(),
         "\n## Erreur par département (jeu de test)\n",
@@ -222,6 +206,9 @@ def run() -> None:
         err_type.to_markdown(index=False),
         "\n## Importance des variables (gain)\n",
         imp.to_markdown(index=False),
+        "\n## Prédictions hors échantillon (écarts au marché du BI)\n",
+        "Chaque vente prédite par un modèle entraîné sans son année.\n",
+        pd.DataFrame([oof], index=["Toutes années"]).to_markdown(),
     ]
     (OUT / "rapport_modele.md").write_text("\n".join(report), encoding="utf-8")
     print((OUT / "rapport_modele.md").read_text(encoding="utf-8"))

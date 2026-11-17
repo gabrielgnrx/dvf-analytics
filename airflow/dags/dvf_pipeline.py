@@ -10,6 +10,7 @@ Ordre d'exécution (une fois par mois) :
         -> dbt : seeds, staging, intermediate, étoile, avec les tests
            exécutés après chaque modèle (Cosmos : une tâche Airflow par modèle)
         -> entraînement du modèle de prix au m² et écriture des prédictions
+           hors échantillon (un modèle par année exclue)
         -> dbt : mart des écarts au modèle
         -> journal d'exécution dans BigQuery (analytics_ops.pipeline_runs)
 
@@ -136,9 +137,11 @@ def dvf_pipeline():
         operator_args=DBT_ARGS,
     )
 
-    @task(execution_timeout=timedelta(minutes=45))
+    # 90 min : en plus des deux modèles évalués, un modèle par année est
+    # entraîné pour les prédictions hors échantillon.
+    @task(execution_timeout=timedelta(minutes=90))
     def train_price_model() -> None:
-        """Réentraîne le modèle et réécrit analytics_ml.predictions_prix_m2."""
+        """Réentraîne le modèle et réécrit analytics_ml.predictions_prix_m2 (hors échantillon)."""
         _in_project_dir()
         from ml.train_prix_m2 import run
 
