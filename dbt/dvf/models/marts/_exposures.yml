@@ -1,0 +1,51 @@
+version: 2
+
+# Usages en aval des marts : ils apparaissent dans le graphe de lignage de la
+# documentation dbt, ce qui montre quels livrables casseraient si un modèle change.
+exposures:
+  - name: rapport_power_bi
+    label: Rapport Power BI DVF Analytics
+    type: dashboard
+    maturity: high
+    description: >
+      Rapport en 5 pages (synthèse exécutive, analyse marché, modèle et écarts,
+      transports et contexte local, qualité des données). Modèle en étoile
+      importé, mesures DAX, sécurité au niveau des lignes par zone.
+      Projet PBIP versionné dans bi/.
+    owner:
+      name: Gabriel Genereux
+    depends_on:
+      - ref('fact_transactions')
+      - ref('dim_temps')
+      - ref('dim_geo')
+      - ref('dim_bien')
+      - ref('mart_ecarts_prix')
+
+  - name: modele_prix_m2
+    label: Modèle LightGBM de prix au m²
+    type: ml
+    maturity: medium
+    description: >
+      Entraîné par ml/train_prix_m2.py sur les ventes simples à prix au m²
+      fiable. Écrit analytics_ml.predictions_prix_m2 (prédictions hors
+      échantillon), relu par mart_ecarts_prix.
+    owner:
+      name: Gabriel Genereux
+    depends_on:
+      - ref('fact_transactions')
+      - ref('dim_geo')
+
+  - name: appli_streamlit
+    label: Explorateur public des prix (Streamlit)
+    type: application
+    maturity: medium
+    description: >
+      Appli publique (app/) alimentée par un extrait agrégé exporté par
+      app/export_extrait.py : prix médians par commune et par année, écarts
+      au modèle.
+    owner:
+      name: Gabriel Genereux
+    depends_on:
+      - ref('fact_transactions')
+      - ref('dim_geo')
+      - ref('mart_ecarts_prix')

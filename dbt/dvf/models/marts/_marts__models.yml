@@ -95,7 +95,11 @@ models:
         tests: [unique, not_null]
 
   - name: mart_ecarts_prix
-    description: "Ventes simples comparées au prix au m² prédit par le modèle (écart en %)."
+    description: >
+      Ventes simples comparées au prix au m² prédit par le modèle (écart en %).
+      Prédictions hors échantillon : chaque vente est prédite par un modèle
+      entraîné sans son année, pour que l'écart ne soit pas tassé par
+      l'apprentissage de la vente elle-même.
     columns:
       - name: transaction_id
         tests: [unique, not_null]

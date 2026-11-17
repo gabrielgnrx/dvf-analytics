@@ -8,6 +8,12 @@ sources:
     tables:
       - name: dvf_mutations
         description: "Transactions immobilières DVF géolocalisées, non nettoyées."
+        # dbt source freshness : alerte avant l'expiration des tables du bac à
+        # sable BigQuery (60 jours) si le pipeline mensuel n'a pas tourné.
+        loaded_at_field: "timestamp(_loaded_at)"
+        freshness:
+          warn_after: {count: 35, period: day}
+          error_after: {count: 55, period: day}
         columns:
           - name: id_mutation
             description: "Identifiant de la mutation (peut couvrir plusieurs lignes)."
