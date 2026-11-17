@@ -1,0 +1,19 @@
+[project]
+name = "dvf-analytics"
+version = "1.1.0"
+description = "Plateforme analytics immobilière de bout en bout sur les données DVF (Île-de-France)"
+requires-python = ">=3.10"
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+extend-exclude = ["dbt/dvf/dbt_packages", "dbt/dvf/target"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["ingestion", "ml", "exploration", "app"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

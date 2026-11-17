@@ -1,0 +1,12 @@
+# Profil utilisé uniquement par la CI (dbt parse, dbt docs) : aucune connexion
+# n'est ouverte vers BigQuery, le projet est fictif.
+dvf:
+  target: ci
+  outputs:
+    ci:
+      type: bigquery
+      method: oauth
+      project: "{{ env_var('GCP_PROJECT_ID') }}"
+      dataset: analytics
+      location: EU
+      threads: 1

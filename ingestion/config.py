@@ -7,7 +7,6 @@ from dataclasses import dataclass, field
 from functools import cached_property
 
 import requests
-
 from dotenv import load_dotenv
 
 load_dotenv()

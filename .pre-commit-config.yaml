@@ -1,0 +1,14 @@
+# Contrôles avant chaque commit : pip install -r requirements-dev.txt puis pre-commit install
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-yaml
+        exclude: ^airflow/docker-compose\.yml$
+      - id: check-added-large-files
+        args: ["--maxkb=2000"]
+      - id: detect-private-key
