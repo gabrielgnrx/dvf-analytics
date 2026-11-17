@@ -33,7 +33,7 @@ def _ventes(n_communes: int = 60, ventes_par_commune: int = 80, seed: int = 0) -
 
 def test_effet_fixe_retrouve_le_vrai_effet():
     df = _ventes()
-    X, y = matrice(df)
+    X, y, _ = matrice(df)
     res = regression_effet_fixe(X, y, df["geo_key"])
     assert res.loc[TRANCHES[0], "coefficient"] == pytest.approx(0.2, abs=0.03)
     assert abs(res.loc[TRANCHES[1], "coefficient"]) < 0.04
@@ -43,14 +43,28 @@ def test_effet_fixe_retrouve_le_vrai_effet():
 
 def test_sans_effet_commune_l_estimation_serait_biaisee():
     df = _ventes()
-    X, y = matrice(df)
+    X, y, _ = matrice(df)
     naif = regression_effet_fixe(X, y, pd.Series("toutes", index=df.index))
     # un seul groupe = simple MCO centré : l'effet gare absorbe l'effet commune
     assert naif.loc[TRANCHES[0], "coefficient"] > 0.3
 
 
 def test_matrice_exclut_la_reference_et_les_constantes():
-    X, y = matrice(_ventes(n_communes=3, ventes_par_commune=20))
-    assert "4. Plus de 2 km" not in X.columns
+    X, y, reference = matrice(_ventes(n_communes=3, ventes_par_commune=20))
+    assert reference == "4. Plus de 2 km"
+    assert reference not in X.columns
     assert "maison" not in X.columns  # un seul type de bien dans l'échantillon
     assert len(X) == len(y)
+
+
+def test_reference_de_repli_sans_tranche_au_dela_de_2_km():
+    # Paris : aucune vente à plus de 2 km d'une gare. Sans référence de repli, les
+    # indicatrices seraient colinéaires avec l'effet fixe et l'estimation arbitraire.
+    df = _ventes()
+    df = df[df["tranche_dist_gare"] != TRANCHES[3]]
+    X, y, reference = matrice(df)
+    assert reference == TRANCHES[2]
+    assert list(c for c in X.columns if c[:1].isdigit()) == TRANCHES[:2]
+    res = regression_effet_fixe(X, y, df["geo_key"])
+    # vrai effet de « moins de 500 m » par rapport à « 1 à 2 km » : +20 %
+    assert res.loc[TRANCHES[0], "coefficient"] == pytest.approx(0.2, abs=0.03)
