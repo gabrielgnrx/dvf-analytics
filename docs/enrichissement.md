@@ -62,7 +62,27 @@ la gare et celui des communes les mieux desservies (proches de Paris). Pour
 isoler l'effet propre de la gare, `ml/effet_gare.py` compare des ventes de la
 même commune (régression hédonique à effet fixe commune, à surface, pièces,
 type de bien et année égaux, erreurs groupées par commune) ; résultats dans
-`ml/output/effet_gare.md`. En
+`ml/output/effet_gare.md`.
+
+**Effet propre de la gare, à commune égale (run du 17 novembre 2026)**
+
+Écart de prix au m² avec les ventes de la même commune situées à plus de 2 km
+d'une gare (à Paris, où aucune vente n'est à plus de 2 km, avec celles situées
+entre 500 m et 1 km). Entre parenthèses : intervalle de confiance à 95 %.
+
+| Zone, type | Moins de 500 m | 500 m à 1 km | 1 à 2 km |
+|---|---:|---:|---:|
+| Paris, appartements | +4,0 % (0,4 à 7,7) | référence | – |
+| Petite couronne, appartements | +23,0 % (7,0 à 41,3) | +18,8 % (3,8 à 36,1) | +13,6 % (0,9 à 27,9) |
+| Petite couronne, maisons | +13,5 % (8,1 à 19,1) | +9,3 % (4,4 à 14,4) | +4,0 % (-0,3 à 8,4) |
+| Grande couronne, appartements | +9,2 % (2,6 à 16,2) | +6,1 % (-0,1 à 12,7) | +0,5 % (-4,0 à 5,3) |
+| Grande couronne, maisons | +3,3 % (1,1 à 5,7) | +2,5 % (0,4 à 4,7) | +0,2 % (-1,1 à 1,6) |
+
+À commune égale, la prime d'un appartement à moins de 500 m d'une gare en
+petite couronne tombe à environ 23 %, contre 80 % dans la comparaison brute :
+l'essentiel de l'écart brut tient à la localisation des communes. La prime
+décroît avec la distance et reste nettement plus faible en grande couronne et
+pour les maisons. En
 grande couronne, l'effet est faible et non monotone : la tranche « plus de
 2 km » contient des communes résidentielles recherchées.
 
