@@ -1,0 +1,5 @@
+# Dépendances de l'appli publique uniquement (Streamlit Community Cloud lit ce
+# fichier, placé à côté de streamlit_app.py, plutôt que celui de la racine).
+streamlit==1.40.2
+pandas==2.2.2
+pyarrow==17.0.0

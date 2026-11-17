@@ -48,3 +48,6 @@ ml/output/
 airflow/.env
 airflow/logs/
 airflow/data/
+
+# Extrait agrégé de l'appli publique (versionné volontairement)
+!app/data/*.parquet
