@@ -48,7 +48,25 @@ La cible dbt `sa` (service account + clé JSON) reste disponible pour une CI.
 python -m ingestion.load_to_bq       # télécharge geo-dvf et remplit raw.dvf_mutations
 python -m exploration.profiling      # rapport de profilage de la donnée brute
 cd dbt/dvf && dbt deps && dbt build  # seeds + staging + intermediate + marts + tests
+dbt source freshness                 # alerte si la table brute approche des 60 jours
+cd ../..
+python -m ml.train_prix_m2           # modèle + prédictions hors échantillon
+cd dbt/dvf && dbt build --select mart_ecarts_prix && cd ../..
+python -m ml.effet_gare              # effet gare à commune égale (ml/output/effet_gare.md)
+python -m app.export_extrait         # extrait agrégé de l'appli publique (app/data)
 ```
+
+## Tests et contrôles locaux
+
+```bash
+pip install -r requirements-dev.txt
+pre-commit install                   # ruff et contrôles à chaque commit
+pytest                               # tests unitaires (sans BigQuery)
+```
+
+Les mêmes contrôles tournent sur GitHub Actions à chaque push, ainsi qu'une
+compilation du projet dbt et la publication de sa documentation sur GitHub
+Pages (activer une fois : Settings > Pages > Source = GitHub Actions).
 
 Périmètre (`.env`) : `DVF_YEARS=auto` (les années publiées dans geo-dvf « latest »
 sont lues sur data.gouv à chaque exécution ; une liste explicite `2023,2024` reste

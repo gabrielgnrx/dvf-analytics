@@ -47,7 +47,7 @@ mesurées au niveau du logement. Détail dans `docs/enrichissement.md`.
 | Maison | 37 787 | 3 536 | 13,2 % |
 | Appartement | 88 710 | 5 694 | 13,0 % |
 
-## Importance des variables (gain)
+## Importance des variables (gain, modèle sans enrichissement)
 
 Commune 58,9 %, département 23,7 %, surface habitable 3,7 %, coordonnées
 (lat/lon logement et centroïde commune) environ 9 %, surface terrain 1,8 %,
@@ -56,11 +56,23 @@ type de bien 1,3 %, pièces 0,6 %, tendance temporelle 0,4 %.
 ## Lecture
 
 - La localisation explique l'essentiel du prix. DVF ne contient ni l'étage,
-  ni l'état du bien, ni le DPE : c'est le plafond de précision structurel du
-  jeu de données, autour de 13 % d'erreur médiane.
+  ni l'état du bien, ni le DPE du logement (seule la part communale de
+  passoires thermiques est ajoutée) : c'est le plafond de précision
+  structurel du jeu de données, autour de 13 % d'erreur médiane.
 - L'erreur est la plus forte à Paris et en Seine-Saint-Denis, deux marchés
   très hétérogènes à l'intérieur d'une même commune ou d'un même arrondissement.
-- Pistes d'amélioration : variables de voisinage (prix médian glissant à
-  500 m, IRIS), DPE rapproché au niveau du logement (adresse) plutôt que de
-  la commune. Les distances aux gares et les indicateurs communaux (revenus,
-  DPE) sont intégrés depuis le 3 octobre 2026.
+- Pistes d'amélioration : variables de voisinage (prix médian des ventes
+  antérieures à moins de 500 m, IRIS), DPE rapproché au niveau du logement
+  (adresse) plutôt que de la commune, intervalles de prédiction (régression
+  quantile) plutôt qu'un prix ponctuel. Les distances aux gares et les
+  indicateurs communaux (revenus, DPE) sont intégrés depuis le 3 octobre 2026.
+
+## Écarts au marché (page « Modèle et écarts » du rapport)
+
+Depuis novembre 2026, les prix attendus de `mart_ecarts_prix` sont des
+prédictions hors échantillon : chaque vente est prédite par un modèle
+entraîné sans son année (une année exclue à la fois, même réglage que le
+modèle évalué). Auparavant, le modèle final était entraîné sur toutes les
+ventes puis appliqué à ces mêmes ventes : il en avait appris une partie, ce
+qui tassait les écarts et sous-estimait les ventes atypiques. Les métriques
+de ces prédictions figurent à la fin de `ml/output/rapport_modele.md`.

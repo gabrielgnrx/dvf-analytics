@@ -1,5 +1,10 @@
 # DVF Analytics — Plateforme analytics immobilière de bout en bout
 
+[![CI](https://github.com/gabrielgnrx/dvf-analytics/actions/workflows/ci.yml/badge.svg)](https://github.com/gabrielgnrx/dvf-analytics/actions/workflows/ci.yml)
+[![Documentation dbt](https://github.com/gabrielgnrx/dvf-analytics/actions/workflows/dbt-docs.yml/badge.svg)](https://gabrielgnrx.github.io/dvf-analytics/)
+
+*English version: [README.en.md](README.en.md)*
+
 Plateforme analytics sur les transactions immobilières françaises publiques (DVF
 géolocalisé), construite comme un projet portfolio data : chaîne complète de
 l'ingestion cloud à la restitution BI, avec une brique data science et une brique
@@ -9,42 +14,55 @@ Enrichissement par données ouvertes : gares IDFM et futures gares du Grand Pari
 Express (distances calculées dans BigQuery), revenus INSEE, diagnostics énergétiques
 ADEME (voir `docs/enrichissement.md`).
 
-Périmètre initial : Île-de-France (départements 75, 77, 78, 91, 92, 93, 94, 95),
-2021 à 2025 (dernière année partielle). Scalable au national une fois la chaîne stabilisée.
+Périmètre : Île-de-France (départements 75, 77, 78, 91, 92, 93, 94, 95), années
+publiées dans geo-dvf (fenêtre glissante d'environ 5 ans, lue sur data.gouv à
+chaque exécution). Scalable au national une fois la chaîne stabilisée.
+
+**Documentation dbt (lignage, descriptions, tests) :** https://gabrielgnrx.github.io/dvf-analytics/
 
 ## Architecture
 
-```
-  Données publiques            Entrepôt cloud                 Restitution
-  (geo-dvf / data.gouv)        (BigQuery)
-  ┌────────────────┐    ┌──────────────────────────┐    ┌──────────────────┐
-  │  CSV.gz par     │    │  raw                      │    │  Power BI         │
-  │  département et  │──► │   └─ dvf_mutations        │    │  (modèle étoile,  │
-  │  par année      │    │                           │    │   DAX, RLS)       │
-  └────────────────┘    │  staging (dbt)            │    └──────────────────┘
-        │                │   └─ stg_dvf__mutations   │           ▲
-        │                │                           │           │
-        ▼                │  marts (dbt)              │           │
-  ┌────────────────┐    │   ├─ fact_transactions    │───────────┘
-  │ load_to_bq.py  │    │   ├─ dim_geo              │
-  │ (ingestion)    │    │   ├─ dim_temps            │    ┌──────────────────┐
-  └────────────────┘    │   └─ dim_bien             │───►│  Modèle ML        │
-                         │                           │    │  (prix au m²,     │
-                         │  + tests dbt (qualité)    │    │   LightGBM)       │
-                         └──────────────────────────┘    └──────────────────┘
+```mermaid
+flowchart LR
+    subgraph Sources["Données ouvertes"]
+        DVF["geo-dvf<br/>data.gouv"]
+        REF["Gares IDFM, Grand Paris Express<br/>revenus INSEE, DPE ADEME"]
+    end
+    subgraph BQ["BigQuery"]
+        RAW["raw<br/>dvf_mutations, ref_*"]
+        STG["staging (dbt)<br/>typage, filtrage"]
+        INT["intermediate (dbt)<br/>grain mutation, distances aux gares"]
+        MARTS["marts (dbt)<br/>fact_transactions, dim_temps,<br/>dim_geo, dim_bien"]
+        ML[("analytics_ml<br/>prédictions hors échantillon")]
+        ECARTS["mart_ecarts_prix"]
+    end
+    DVF --> ING["ingestion/<br/>Python"] --> RAW
+    REF --> ING
+    RAW --> STG --> INT --> MARTS
+    MARTS --> TRAIN["ml/<br/>LightGBM"] --> ML --> ECARTS
+    MARTS --> ECARTS
+    MARTS --> PBI["Power BI<br/>étoile, DAX, RLS"]
+    ECARTS --> PBI
+    MARTS --> APP["Appli Streamlit<br/>extrait agrégé"]
+    ECARTS --> APP
+    AF{{"Airflow + Cosmos<br/>mensuel, Docker"}} -.orchestre.-> ING
+    AF -.-> STG
+    AF -.-> TRAIN
 ```
 
 ## Couches et compétences démontrées
 
 | Couche | Dossier | Compétence ciblée |
 |---|---|---|
-| Ingestion | `ingestion/` | Pipeline data, cloud warehouse |
+| Ingestion | `ingestion/` | Pipeline data, cloud warehouse, rafraîchissement incrémental des fichiers |
 | Enrichissement | `ingestion/enrichment.py` + `stg_ref__*` | Croisement de sources ouvertes (IDFM, INSEE, ADEME), géospatial BigQuery |
-| Transformation | `dbt/dvf/models/` | Analytics engineering (dbt, schéma étoile) |
-| Qualité | tests dbt + `exploration/` | Gouvernance / data quality |
-| Data science | `ml/` | Modélisation, méthodo ML |
+| Transformation | `dbt/dvf/models/` | Analytics engineering (dbt, schéma étoile, exposures, fraîcheur des sources) |
+| Qualité | tests dbt + `exploration/` + `tests/` | Gouvernance, data quality, tests unitaires |
+| Data science | `ml/` | Modélisation, validation temporelle, prédictions hors échantillon, régression hédonique |
 | BI | `bi/` + Power BI | Modélisation dimensionnelle, DAX, RLS |
 | Orchestration | `airflow/` | Airflow + Cosmos, Docker, contrôle qualité bloquant |
+| Restitution publique | `app/` | Appli Streamlit sur extrait agrégé |
+| Industrialisation | `.github/workflows/` | CI (ruff, pytest, dbt parse), documentation publiée sur GitHub Pages |
 
 ## Démarrage rapide
 
@@ -53,21 +71,32 @@ Périmètre initial : Île-de-France (départements 75, 77, 78, 91, 92, 93, 94, 
 3. `pip install -r requirements.txt`
 4. Copier `.env.example` vers `.env` et le remplir.
 5. Ingestion : `python -m ingestion.load_to_bq` puis `python -m ingestion.enrichment`
-6. dbt : `cd dbt/dvf && dbt debug && dbt build`
+6. dbt : `cd dbt/dvf && dbt debug && dbt build`, puis `dbt source freshness`
+7. Modèle : `python -m ml.train_prix_m2`, puis `dbt build --select mart_ecarts_prix`
+8. Effet gare à commune égale : `python -m ml.effet_gare`
+9. Appli : `python -m app.export_extrait` puis `streamlit run app/streamlit_app.py`
 
-Détail dans `SETUP.md`.
+Développement : `pip install -r requirements-dev.txt`, `pre-commit install`,
+`pytest`. Détail dans `SETUP.md`, orchestration dans `airflow/README.md`.
 
 ## Avancement
 
 - [x] Semaine 1 — Socle : ingestion + raw dans BigQuery + dbt connecté + profilage
 - [x] Semaine 2 — Transformation : staging + intermediate + schéma étoile + tests (premier jet)
 - [x] Semaine 3 — Data science : modèle prix au m², méthodo, analyse d'erreur (voir `docs/resultats_modele.md`)
-- [x] Semaine 4 — BI : modèle sémantique Power BI (import, étoile, 21 mesures DAX, 3 rôles RLS), rapport 4 pages (`bi/DVF_Analytics.pbip`)
+- [x] Semaine 4 — BI : modèle sémantique Power BI (import, étoile, 21 mesures DAX, 3 rôles RLS), rapport 5 pages (`bi/DVF_Analytics.pbip`)
 - [x] Semaine 5 — Gouvernance : lignage, règles, tests, indicateurs qualité, RLS (`docs/gouvernance_qualite.md`)
 - [x] Orchestration : pipeline mensuel Airflow (Docker + Cosmos), voir `airflow/README.md`
 - [x] Enrichissement : gares et Grand Paris Express (IDFM), revenus (INSEE), DPE (ADEME), page Power BI « Transports et contexte local » (`docs/enrichissement.md`)
+- [x] Industrialisation : tests unitaires, CI, documentation dbt en ligne, exposures, fraîcheur des sources
+- [x] Écarts au marché calculés hors échantillon ; effet gare estimé à commune égale
+- [x] Appli publique Streamlit (`app/`)
 
-## Premiers résultats (Île-de-France, 2021 à 2025)
+Prochaines étapes : vidéo de démonstration, passage au national, variables de
+voisinage (prix des ventes antérieures à moins de 500 m), intervalles de
+prédiction.
+
+## Premiers résultats (run du 3 octobre 2026, publication DVF d'avril 2026, 2021 à 2025)
 
 - 2,43 M lignes brutes chargées, agrégées en environ 885 000 mutations (ventes).
 - Une mutation DVF est éclatée sur plusieurs lignes et la valeur foncière y est
@@ -81,6 +110,12 @@ Détail dans `SETUP.md`.
 - 42 contrôles dbt (tests de schéma, relations fait / dimensions, plages de valeurs) : 41 OK, 1 avertissement documenté.
 - Modèle LightGBM, test sur 2025 jamais vue : erreur médiane 13,0 % contre 16,3 % pour la baseline médiane commune x type (R² log 0,80).
 - Enrichissement : en petite couronne, un appartement à moins de 500 m d'une gare
-  se vend environ 80 % plus cher au m² qu'à plus de 2 km ; pas de prime
-  « Grand Paris Express » visible entre 2021 et 2025 ; le modèle enrichi passe à
-  12,8 % d'erreur médiane (voir `docs/enrichissement.md`).
+  se vend environ 80 % plus cher au m² qu'à plus de 2 km, écart qui mêle l'effet
+  de la gare et celui de la commune (voir `ml/effet_gare.py` pour l'effet à
+  commune égale) ; pas de prime « Grand Paris Express » visible entre 2021 et
+  2025 ; le modèle enrichi passe à 12,8 % d'erreur médiane (voir `docs/enrichissement.md`).
+
+## Licence
+
+Code sous licence MIT (`LICENSE`). Les données restent sous les licences de
+leurs producteurs (DGFiP via data.gouv, Île-de-France Mobilités, INSEE, ADEME).

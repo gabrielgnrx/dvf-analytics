@@ -13,7 +13,7 @@ exposée, de la source publique jusqu'au rapport Power BI.
 | Typage | `stg_dvf__mutations` | dbt (vue) | Tests not_null, plages, valeurs acceptées |
 | Grain mutation | `int_dvf__mutations` | dbt (vue) | Unicité de `id_mutation`, typologie contrôlée |
 | Étoile | `fact_transactions`, `dim_temps`, `dim_geo`, `dim_bien` | dbt (tables) | Unicité des clés, intégrité référentielle fait → dimensions |
-| Modèle | `analytics_ml.predictions_prix_m2` | `ml/train_prix_m2.py` | Évaluation sur 2025 jamais vue, baseline de référence |
+| Modèle | `analytics_ml.predictions_prix_m2` | `ml/train_prix_m2.py` | Évaluation sur la dernière année jamais vue, baseline de référence, prédictions hors échantillon |
 | Restitution | `mart_ecarts_prix`, rapport Power BI | dbt + Power BI | Relations, RLS par zone |
 
 ## 2. Règles de qualité appliquées
