@@ -35,6 +35,8 @@ jobs:
           cache: pip
       - run: pip install dbt-bigquery==1.8.2
       - run: dbt deps --profiles-dir ../../.github/dbt
+      # docs generate --no-compile relit le manifeste : il doit exister.
+      - run: dbt parse --profiles-dir ../../.github/dbt
       - run: dbt docs generate --profiles-dir ../../.github/dbt --empty-catalog --no-compile
       - run: |
           mkdir -p site
