@@ -26,9 +26,16 @@ REFERENCE = "4. Plus de 2 km"
 OUT = Path(os.getenv("ML_OUTPUT_DIR", "ml/output"))
 
 
-def matrice(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
-    """Variables explicatives (indicatrices, référence exclue) et cible log(prix_m2)."""
-    tranches = pd.get_dummies(df["tranche_dist_gare"], dtype=float).drop(columns=REFERENCE, errors="ignore")
+def matrice(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series, str]:
+    """Variables explicatives (indicatrices, référence exclue), cible log(prix_m2) et tranche de référence.
+
+    La référence est la tranche « plus de 2 km » quand elle existe, sinon la tranche la plus
+    éloignée présente (à Paris, aucune vente n'est à plus de 2 km d'une gare). Sans référence,
+    les indicatrices de tranche seraient colinéaires avec l'effet fixe commune.
+    """
+    presentes = sorted(df["tranche_dist_gare"].unique())
+    reference = REFERENCE if REFERENCE in presentes else presentes[-1]
+    tranches = pd.get_dummies(df["tranche_dist_gare"], dtype=float).drop(columns=reference)
     annees = pd.get_dummies(df["annee"].astype(str), prefix="annee", dtype=float).iloc[:, 1:]
     X = pd.concat(
         [
@@ -47,7 +54,7 @@ def matrice(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
     )
     # Variables constantes dans l'échantillon (ex. un seul type de bien) : retirées.
     X = X.loc[:, X.std() > 0]
-    return X, np.log(df["prix_m2"].astype(float))
+    return X, np.log(df["prix_m2"].astype(float)), reference
 
 
 def regression_effet_fixe(X: pd.DataFrame, y: pd.Series, groupes: pd.Series) -> pd.DataFrame:
@@ -98,17 +105,19 @@ def run() -> None:
     df = client.query(SQL.format(project=config.project_id)).to_dataframe()
 
     lignes = ["# Effet de la proximité d'une gare, à commune égale\n",
-              "Référence : ventes à plus de 2 km d'une gare de la même commune. "
+              "Écart de prix au m² avec les ventes de la tranche de référence de la même commune "
+              "(plus de 2 km d'une gare, ou tranche la plus éloignée disponible). "
               "Contrôles : surface (log), pièces, maison, année. IC à 95 %, erreurs groupées par commune.\n"]
     for zone in ["Paris", "Petite couronne", "Grande couronne"]:
         for type_bien in ["Appartement", "Maison"]:
             part = df[(df["zone"] == zone) & (df["type_bien"] == type_bien)]
             if part["tranche_dist_gare"].nunique() < 2 or part["geo_key"].nunique() < 2:
                 continue
-            X, y = matrice(part)
+            X, y, reference = matrice(part)
             res = regression_effet_fixe(X, y, part["geo_key"])
             tranches = res.loc[[c for c in res.index if c[:1].isdigit()]].round(1)
-            lignes += [f"\n## {zone}, {type_bien.lower()}s ({len(part):,} ventes)\n",
+            titre = f"{zone}, {type_bien.lower()}s ({len(part):,} ventes, référence : {reference[3:]})"
+            lignes += [f"\n## {titre}\n",
                        tranches[["effet_pct", "ic95_bas_pct", "ic95_haut_pct"]].to_markdown()]
             print(f"{zone}, {type_bien} :\n{tranches.to_string()}\n")
 
