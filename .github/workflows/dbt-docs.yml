@@ -1,0 +1,54 @@
+name: Documentation dbt
+
+# Publie la documentation dbt (lignage, descriptions, tests) sur GitHub Pages.
+# Prérequis, une seule fois : Settings > Pages > Source = "GitHub Actions".
+# Aucune connexion à BigQuery : catalogue vide, SQL non compilé.
+
+on:
+  push:
+    branches: [main]
+    paths: ["dbt/**", ".github/workflows/dbt-docs.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GCP_PROJECT_ID: dvf-analytics-ci
+    defaults:
+      run:
+        working-directory: dbt/dvf
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install dbt-bigquery==1.8.2
+      - run: dbt deps --profiles-dir ../../.github/dbt
+      - run: dbt docs generate --profiles-dir ../../.github/dbt --empty-catalog --no-compile
+      - run: |
+          mkdir -p site
+          cp target/index.html target/manifest.json target/catalog.json site/
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dbt/dvf/site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
