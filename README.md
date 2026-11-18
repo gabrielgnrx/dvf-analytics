@@ -18,6 +18,8 @@ Périmètre : Île-de-France (départements 75, 77, 78, 91, 92, 93, 94, 95), ann
 publiées dans geo-dvf (fenêtre glissante d'environ 5 ans, lue sur data.gouv à
 chaque exécution). Scalable au national une fois la chaîne stabilisée.
 
+**Appli publique (carte des prix, fourchettes, effet gare, écarts au modèle) :** https://dvf-analytics.streamlit.app/
+
 **Documentation dbt (lignage, descriptions, tests) :** https://gabrielgnrx.github.io/dvf-analytics/
 
 ## Architecture
