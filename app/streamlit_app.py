@@ -127,7 +127,12 @@ with onglet_gares:
     )
 
 with onglet_ecarts:
-    vue = ecarts[(ecarts["type_bien"] == type_bien) & ecarts["zone"].isin(zones_choisies)]
+    min_ventes = st.slider("Ventes minimum par commune", 5, 200, 30, step=5)
+    vue = ecarts[
+        (ecarts["type_bien"] == type_bien)
+        & ecarts["zone"].isin(zones_choisies)
+        & (ecarts["nb_ventes"] >= min_ventes)
+    ]
     st.markdown(
         "Écart entre le prix de vente et le prix attendu par le modèle LightGBM, calculé hors "
         "échantillon. Un écart médian élevé signale un marché hétérogène, que la localisation et "
