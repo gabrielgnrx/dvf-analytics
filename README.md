@@ -94,10 +94,6 @@ Développement : `pip install -r requirements-dev.txt`, `pre-commit install`,
 - [x] Écarts au marché calculés hors échantillon ; effet gare estimé à commune égale
 - [x] Appli publique Streamlit (`app/`)
 
-Prochaines étapes : vidéo de démonstration, passage au national, variables de
-voisinage (prix des ventes antérieures à moins de 500 m), intervalles de
-prédiction.
-
 ## Premiers résultats (run du 17 novembre 2026, geo-dvf 2021 à 2025)
 
 - 2,43 M lignes brutes chargées, agrégées en environ 885 000 mutations (ventes).
