@@ -31,7 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Modèle LightGBM validé sur 2025 (erreur médiane 13 %), puis réentraîné sur tout l'historique. Écart = (prix réel - prix prédit) / prix prédit.",
+                    "value": "Modèle LightGBM (erreur médiane 13 % sur 2025), prix prédit hors échantillon. Écart = (prix réel - prix prédit) / prix prédit.",
                     "textStyle": {
                       "fontSize": "9pt",
                       "color": "#C9D6E6"
