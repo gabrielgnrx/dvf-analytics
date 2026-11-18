@@ -13,6 +13,8 @@ science layer and a data quality layer.
 Scope: Île-de-France (Paris region, 8 départements), all years currently
 published (rolling window of about five years, discovered at each run).
 
+**Public app (price map, price ranges, station effect, model residuals; in French):** https://dvf-analytics.streamlit.app/
+
 **dbt documentation (lineage, descriptions, tests):** https://gabrielgnrx.github.io/dvf-analytics/
 
 ## Stack
